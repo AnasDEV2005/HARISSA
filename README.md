@@ -7,7 +7,7 @@ ai generated readme of my plans
 
 TELL stands for “Textual Explicit Lightweight Language.” It’s a compiled, general-purpose programming language that prioritizes readability and explicitness over brevity. Built as a wrapper over Rust, TELL aims to make systems-level performance accessible through a simplified and expressive syntax.
 
----
+
 
 ## Philosophy
 
@@ -15,7 +15,7 @@ TELL  intentionally avoids shorthand, magical behavior, and obscure syntax. Ever
 
 TELL reduces mental overhead by removing hidden memory concepts, enforcing explicit typing, and providing predictable structure. It emphasizes learning-friendly design while keeping powerful Rust capabilities under the hood.
 
----
+
 
 ## Key Features
 
@@ -29,7 +29,7 @@ TELL reduces mental overhead by removing hidden memory concepts, enforcing expli
 - Built-in list, map, tuple, string, and struct types  
 - Rust-inspired performance with Python-inspired simplicity  
 
----
+
 
 ## Memory Model
 
@@ -45,7 +45,7 @@ The transpiler tracks how values are used:
 
 This “copy on surface, borrow in secret” model keeps code readable while remaining performant and memory-safe.
 
----
+
 
 ## Error Handling
 
@@ -56,7 +56,7 @@ Errors can also be mapped at the file or function level for reusable recovery lo
 
 For example, when calling a function that may fail, users can attach an `.except` clause to handle specific failure cases. Errors not explicitly handled will fall back to default mappings defined at the file level.
 
----
+
 
 ## Standard Library
 
@@ -69,7 +69,7 @@ TELL ships with a full-featured standard library by default. This includes:
 
 Most of the standard library is written in TELL itself. (PAUSE - i didnt say that.. :sob:) Only essential external crates are used internally to reduce compile time and improve stability.
 
----
+
 
 ## Integration with Rust
 
@@ -78,7 +78,7 @@ TELL is built on top of Rust and transpiles directly into safe, idiomatic Rust c
 So I can call functions from Rust crates using simplified syntax. Macros and special behaviors are detected automatically when a crate is imported. For advanced cases, developers can manually wrap crates using TELL’s Rust interop tools.
                                                                  (i still dont fully understand macros so this part is a rough idea)
                                                                  
----
+
 
 ## Compilation & Tooling
 
@@ -90,7 +90,7 @@ TELL compiles to a single binary. This tool handles:
 There’s no interpreter in the initial release. All code is compiled, allowing fast execution and safe memory usage.
 (Well yeah, cuz its written in Rust)
 
----
+
 
 ## Project Roadmap
 
