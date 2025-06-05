@@ -41,6 +41,8 @@ The transpiler tracks how values are used:
 - If reused with mutation, a mutable reference is used.  
 - If usage would break Rust’s rules, a safe clone is inserted.  
 
+(not very sure about this part, still fleshing out the idea)
+
 This “copy on surface, borrow in secret” model keeps code readable while remaining performant and memory-safe.
 
 ---
