@@ -106,4 +106,4 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 
 
 ## Progress
-- 5 june 2025
+- 5 june 2025 | wrote the token and started scanner/lexer
