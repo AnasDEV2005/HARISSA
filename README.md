@@ -5,7 +5,7 @@ ai generated readme of my plans
 
 # TELL Programming Language
 
-TELL stands for “Textual Explicit Lightweight Language.” It’s a compiled, general-purpose programming language that prioritizes readability and explicitness over brevity. Built as a wrapper over Rust, TELL aims to make systems-level performance accessible through a simplified and expressive syntax.
+TELL stands for “Textually Explicit and Lightweight Language.” It’s a compiled, general-purpose programming language that prioritizes readability and explicitness over brevity. Built as a wrapper over Rust, TELL aims to make systems-level performance accessible through a simplified and expressive syntax.
 
 
 
