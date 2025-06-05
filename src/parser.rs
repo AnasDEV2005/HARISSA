@@ -1,7 +1,7 @@
 // src/parser.rs
 
 use crate::ast::AstNode;
-use crate::scanner::Token;
+use crate::token::Token;
 
 /// Takes the flat `Vec<Token>` stream and splits on Newline, bundling each line’s tokens into one `AstNode::Line`.
 pub fn parse_lines(tokens: Vec<Token>) -> Vec<AstNode> {
