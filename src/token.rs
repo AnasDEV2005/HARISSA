@@ -6,6 +6,7 @@ pub enum Token {
            // const TYPE x = 1
     Mut, // defining a mutable variable
          // mut TYPE x = 1
+    Type(String),
     Identifier(String),
     Number(String),
     Equals,

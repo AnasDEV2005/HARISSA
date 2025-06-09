@@ -1,8 +1,8 @@
 use clap::Parser;
 mod scanner;
 mod parser;
-mod ast;
-mod codegen;
+mod syntaxtree;
+mod transpiler;
 mod util;
 mod token;
 

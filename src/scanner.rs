@@ -88,6 +88,12 @@ impl Scanner {
         // Check for reserved words like "let"
         match ident.as_str() {
             "let" => Token::Let,
+            "const" => Token::Const,
+            "mut" => Token::Mut,
+            "INT" => Token::Type(ident),
+            "TUPLE" => Token::Type(ident),
+            "LIST" => Token::Type(ident),
+            "STR" => Token::Type(ident),
             _ => Token::Identifier(ident),
         }
     }

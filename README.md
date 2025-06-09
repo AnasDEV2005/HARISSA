@@ -1,3 +1,4 @@
+
 ai generated readme of my plans 
 
 # WIP
@@ -9,7 +10,7 @@ TELL stands for “Textually Explicit and Lightweight Language.” It’s a comp
 
 
 
-## Philosophy
+## concept
 
 TELL  intentionally avoids shorthand, magical behavior, and obscure syntax. Every line of code is meant to be readable, teachable, and obvious in function — even at the cost of verbosity.
 
@@ -17,11 +18,9 @@ TELL reduces mental overhead by removing hidden memory concepts, enforcing expli
 
 
 
-## Key Features
-
-- Curly-brace syntax, similar to C-like languages  
-- No semicolon requirement at end of lines  
-- Mandatory type annotations on definitions (with some inference)  
+## ideas
+  
+-  type annotations on definitions  
 - Explicit mutability: variables must be marked mutable to be reassigned  
 - Readable function syntax with defined argument and return types  
 - Familiar conditionals and loops with enforced block scoping  
@@ -31,7 +30,7 @@ TELL reduces mental overhead by removing hidden memory concepts, enforcing expli
 
 
 
-## Memory Model
+## Memory 
 
 TELL hides the complexity of Rust’s ownership and borrowing. Users never interact with references or lifetimes. Variable assignments appear to copy or move values, while internally the compiler chooses the most efficient path.
 
@@ -107,3 +106,4 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 
 ## Progress
 - 5 june 2025 | wrote the token and started scanner/lexer
+- 9 june 2025 | more to token & scanner and started parser
