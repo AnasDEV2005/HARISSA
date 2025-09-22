@@ -3,17 +3,14 @@
 use std::fs;
 use std::process::Command;
 
-/// Read the entire file into a String
-pub fn read_file(path: &str) -> Result<String, std::io::Error> {
-    fs::read_to_string(path)
-}
 
-/// Write a String to a file (overwriting if it exists)
+
+
+
 pub fn write_file(path: &str, content: &str) -> Result<(), std::io::Error> {
     fs::write(path, content)
 }
 
-/// Invoke `rustc` on the given .rs file (errors printed to console)
 pub fn compile_rust(source_rs: &str) {
     let output = Command::new("rustc")
         .arg(source_rs)
@@ -26,4 +23,6 @@ pub fn compile_rust(source_rs: &str) {
         println!("Compiled {} successfully.", source_rs);
     }
 }
+
+
 

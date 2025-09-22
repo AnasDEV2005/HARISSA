@@ -14,35 +14,6 @@ TELL stands for “Textually Explicit and Lightweight Language.” It’s a comp
 
 TELL  intentionally avoids shorthand, magical behavior, and obscure syntax. Every line of code is meant to be readable, teachable, and obvious in function — even at the cost of verbosity.
 
-TELL reduces mental overhead by removing hidden memory concepts, enforcing explicit typing, and providing predictable structure. It emphasizes learning-friendly design while keeping powerful Rust capabilities under the hood.
-
-
-
-## ideas
-  
--  type annotations on definitions  
-- Explicit mutability: variables must be marked mutable to be reassigned  
-- Readable function syntax with defined argument and return types  
-- Familiar conditionals and loops with enforced block scoping  
-- No references, pointers, or lifetimes exposed to users  
-- Built-in list, map, tuple, string, and struct types  
-- Rust-inspired performance with Python-inspired simplicity  
-
-
-
-## Memory 
-
-TELL hides the complexity of Rust’s ownership and borrowing. Users never interact with references or lifetimes. Variable assignments appear to copy or move values, while internally the compiler chooses the most efficient path.
-
-The transpiler tracks how values are used:  
-- If used once, they are moved directly.  
-- If reused without mutation, an internal reference is used.  
-- If reused with mutation, a mutable reference is used.  
-- If usage would break Rust’s rules, a safe clone is inserted.  
-
-(not very sure about this part, still fleshing out the idea)
-
-This “copy on surface, borrow in secret” model keeps code readable while remaining performant and memory-safe.
 
 
 
@@ -72,12 +43,36 @@ Most of the standard library is written in TELL itself. (PAUSE - i didnt say tha
 
 ## Integration with Rust
 
-TELL is built on top of Rust and transpiles directly into safe, idiomatic Rust code. It retains Rust’s performance, safety, and ecosystem while abstracting away its complexity.
+TELL is built on top of Rust and transpiles directly into  Rust code. It retains Rust’s performance, safety, and ecosystem while abstracting away its complexity. (hopefully)
 
-So I can call functions from Rust crates using simplified syntax. Macros and special behaviors are detected automatically when a crate is imported. For advanced cases, developers can manually wrap crates using TELL’s Rust interop tools.
+So I can call functions from Rust crates using simplified syntax. Macros and special behaviors are detected automatically when a crate is imported. For advanced cases, developers can manually wrap crates...
                                                                  (i still dont fully understand macros so this part is a rough idea)
                                                                  
 
+
+## ideas
+  
+- type annotations on definitions  
+- Explicit mutability: variables must be marked mutable to be reassigned  
+- Readable function syntax with defined argument and return types  
+- Familiar conditionals and loops with enforced block scoping  
+- No references, pointers, or lifetimes exposed to users  
+- Built-in list, map, tuple, string, and struct types  
+- Rust-inspired performance with Python-inspired simplicity  
+
+- Memory 
+
+TELL hides the complexity of Rust’s ownership and borrowing. Users never interact with references or lifetimes. Variable assignments appear to copy or move values, while internally the compiler chooses the most efficient path.
+
+The transpiler tracks how values are used:  
+- If used once, they are moved directly.  
+- If reused without mutation, an internal reference is used.  
+- If reused with mutation, a mutable reference is used.  
+- If usage would break Rust’s rules, a safe clone is inserted.  
+
+(not very sure about this part, still fleshing out the idea)
+
+This “copy on surface, borrow in secret” model keeps code readable while remaining performant and memory-safe.
 
 ## Compilation & Tooling
 
@@ -90,20 +85,11 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 (Well yeah, cuz its written in Rust)
 
 
-
-## Project Roadmap
-
-1. Support for variable declarations, printing, and input  *
-2. Core control flow (conditionals and loops)  
-3. Functions and scopes  
-4. Static checking and error reporting (precompiler)  
-5. Type system and type inference  
-6. Integration with Rust crates and macro support  
-7. Polished standard library and CLI tools  
-
 ---
 
 
 ## Progress
 - 5 june 2025 | wrote the token and started scanner/lexer
 - 9 june 2025 | more to token & scanner and started parser
+- 19 sep 2025 | redoing it, without the help of chatgpt this time... worked on the project layout, and changed it a bit 
+- 20 sep 2025 | wrote the file reader
