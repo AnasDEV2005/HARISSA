@@ -93,3 +93,5 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 - 9 june 2025 | more to token & scanner and started parser
 - 19 sep 2025 | redoing it, without the help of chatgpt this time... worked on the project layout, and changed it a bit 
 - 20 sep 2025 | wrote the file reader
+- 21 sep 2025 | more to file reader
+- 22 sep 2025 | added punctuation and operators to reader
