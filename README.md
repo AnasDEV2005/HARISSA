@@ -95,3 +95,5 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 - 20 sep 2025 | wrote the file reader
 - 21 sep 2025 | more to file reader
 - 22 sep 2025 | added punctuation and operators to reader
+- 23-25 sep ..| spent alot of time fixing this: i wanted to read everything between "" or '' as full strings directly, so i had to edit the code accordingly
+- 
