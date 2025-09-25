@@ -96,4 +96,7 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 - 21 sep 2025 | more to file reader
 - 22 sep 2025 | added punctuation and operators to reader
 - 23-25 sep ..| spent alot of time fixing this: i wanted to read everything between "" or '' as full strings directly, so i had to edit the code accordingly
-- 
+- 25 sep 2025 | started the tokenizer. Basically, after going through the code file, i seperated it by spaces, then went through that seperated list to make it into a a list of tokens.
+Now im thinking i need to add comments
+and maybe add the tokens for other stuff, other features i guess.
+- 26 sep 2025 |

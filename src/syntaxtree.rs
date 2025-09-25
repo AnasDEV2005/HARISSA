@@ -1,68 +1,72 @@
 // src/syntaxtree.rs
 
+
+
+
+
+// expression is basically something that has a value
 #[derive(Debug)]
-pub enum Expr {
+pub enum Expression {
     Number(String),
     String(String),
     Boolean(bool),
     Identifier(String),
     
     Binary {
-        left: Box<Expr>,
+        left: Box<Expression>,
         operator: String,
-        right: Box<Expr>,
+        right: Box<Expression>,
     },
 
     Unary {
         operator: String,
-        operand: Box<Expr>,
+        operand: Box<Expression>,
     },
 
     Call {
-        callee: Box<Expr>,
-        arguments: Vec<Expr>,
+        callee: Box<Expression>,
+        arguments: Vec<Expression>,
     },
 }
 
+
+// statement is a key word that does something
 #[derive(Debug)]
-pub enum Stmt {
-    LetDeclaration {
-        name: String,
-        value: Expr,
-    },
+pub enum Statement {
 
     ConstDeclaration {
         name: String,
         datatype: String,
-        value: Expr,
+        value: Expression,
     },
 
     MutDeclaration {
         name: String,
         datatype: String,
-        value: Expr,
+        value: Expression,
     },
 
-    Expression(Expr),
+    Expression(Expression),
 
-    Block(Vec<Stmt>),
+    Block(Vec<Statement>),
 
     If {
-        condition: Expr,
-        then_branch: Box<Stmt>,
-        else_branch: Option<Box<Stmt>>,
+        condition: Expression,
+        then_branch: Box<Statement>,
+        else_branch: Option<Box<Statement>>,
     },
 
     While {
-        condition: Expr,
-        body: Box<Stmt>,
+        condition: Expression,
+        body: Box<Statement>,
     },
 
     Function {
         name: String,
         params: Vec<String>,
-        body: Box<Stmt>, // usually a Block
+        body: Box<Statement>, // usually a Block
     },
 }
+
 
 

@@ -10,6 +10,7 @@ pub fn read_file(file_path: &str) -> String {
     c
 }
 
+
 pub fn parse_contents(contents: String) -> Vec<String> {
     let mut inside_single_string = false;
     let mut inside_double_string = false;
@@ -40,7 +41,6 @@ pub fn parse_contents(contents: String) -> Vec<String> {
                 '"' => if !inside_single_string {
                     if inside_double_string {
 
-                        println!("{}", word);
                         parsed_contents.push(word.clone());
                         word.clear();
                         parsed_contents.push(char.to_string());
@@ -72,9 +72,10 @@ pub fn parse_contents(contents: String) -> Vec<String> {
 
                         word.push(char); 
                     } else {
-
-                        parsed_contents.push(word.clone()); 
-                        word.clear();
+                        if !word.is_empty() {
+                            parsed_contents.push(word.clone());
+                            word.clear();
+                        }
                     }
                 },
 
