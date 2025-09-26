@@ -1,4 +1,3 @@
-// the TOKENS HERE WILL BE ORGANIZED IN A VEC, BEFORE THE WHOLE THING IS TURNED INTO A SYNTAX TREE
 #[derive(Debug)]
 pub enum Token {
     Keyword(String),
@@ -36,7 +35,13 @@ pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
                     previous = element.to_string();
                 },
 
-                "\"" | "'" | ":" | "=" | "+" | "-" | "/" | "*" | "%" | "|" | "&" | "?" | "[" | "]" | "{" | "}" | "(" | ")" | "#" | ">" | "<" | "," | "." | "!" | ";" | "\\" | "\n" => {
+                "=" | "+" | "-" | "/" | "*" | "%" | "|" | "&" | ">" | "<" => {
+                    let c: char = element.chars().next().unwrap();
+                    tokens.push(Token::Operator(c.to_string()));
+                    previous = element.to_string();
+                },
+
+                "\"" | "'" | ":" | "?" | "[" | "]" | "{" | "}" | "(" | ")" | "#" | "," | "." | "!" | ";" | "\\" | "\n" => {
                     let c: char = element.chars().next().unwrap();
                     tokens.push(Token::Symbol(c));
                     previous = element.to_string();

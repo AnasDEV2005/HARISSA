@@ -99,4 +99,6 @@ There’s no interpreter in the initial release. All code is compiled, allowing 
 - 25 sep 2025 | started the tokenizer. Basically, after going through the code file, i seperated it by spaces, then went through that seperated list to make it into a a list of tokens.
 Now im thinking i need to add comments
 and maybe add the tokens for other stuff, other features i guess.
-- 26 sep 2025 |
+- 26 sep 2025 | added the possibility to ignore comments and dealt with the newline issue (i was splitting elements by whitespace only)
+- 
+

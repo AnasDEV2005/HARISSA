@@ -10,10 +10,12 @@ pub fn read_file(file_path: &str) -> String {
     c
 }
 
-
 pub fn parse_contents(contents: String) -> Vec<String> {
     let mut inside_single_string = false;
     let mut inside_double_string = false;
+
+    let mut slash = false;
+    let mut ignore_until_n = false;
 
     let mut parsed_contents = Vec::new();
     let mut word = String::new();
@@ -23,37 +25,51 @@ pub fn parse_contents(contents: String) -> Vec<String> {
 
 
             match char {
-
-                '\'' => if !inside_double_string {
-                    if inside_single_string {
-
-                        parsed_contents.push(word.clone());
-                        word.clear();
-                        parsed_contents.push(char.to_string());
-                        inside_single_string = false;
+                '/' => {
+                    if slash {
+                        ignore_until_n = true;
                     } else {
+                        slash = true;
+                    };
+                },
 
-                        word.clear();
-                        parsed_contents.push("'".to_string());
-                        inside_single_string = true;
-                    }
-                } else {word.push(char);},
-                '"' => if !inside_single_string {
-                    if inside_double_string {
 
-                        parsed_contents.push(word.clone());
-                        word.clear();
-                        parsed_contents.push(char.to_string());
-                        inside_double_string = false;
-                    } else {
+                '\'' => if !ignore_until_n {
+                    if !inside_double_string {
+                        if inside_single_string {
 
-                        word.clear();
-                        parsed_contents.push("\"".to_string());
-                        inside_double_string = true;
-                    }
-                } else {word.push(char);},
+                            parsed_contents.push(word.clone());
+                            word.clear();
+                            parsed_contents.push(char.to_string());
+                            inside_single_string = false;
+                        } else {
 
-                ':' | '=' | '+' | '-' | '/' | '*' | '%' | '|' | '&' | '?' | '[' | ']' | '{' | '}' | '(' | ')' | '#' | '>' | '<' | ',' | '.' | '!' | ';' | '\\' | '\n'=> if inside_single_string || inside_double_string { 
+                            word.clear();
+                            parsed_contents.push("'".to_string());
+                            inside_single_string = true;
+                        }
+                    } else {word.push(char);}
+                },
+
+                '"' => if !ignore_until_n { 
+                    if !inside_single_string {
+                        if inside_double_string {
+
+                            parsed_contents.push(word.clone());
+                            word.clear();
+                            parsed_contents.push(char.to_string());
+                            inside_double_string = false;
+                        } else {
+
+                            word.clear();
+                            parsed_contents.push("\"".to_string());
+                            inside_double_string = true;
+                        }
+                    } else {word.push(char);}
+                },
+
+                ':' | '=' | '+' | '-' | '*' | '%' | '|' | '&' | '?' | '[' | ']' | '{' | '}' | '(' | ')' | '#' | '>' | '<' | ',' | '.' | '!' | ';' | '\\' => if !ignore_until_n {
+                    if inside_single_string || inside_double_string { 
 
                         word.push(char);
                     } else {
@@ -65,21 +81,26 @@ pub fn parse_contents(contents: String) -> Vec<String> {
 
                         parsed_contents.push(char.to_string());
                         word.clear();
-                },
-
-                ' ' => {
-                    if inside_single_string || inside_double_string {
-
-                        word.push(char); 
-                    } else {
-                        if !word.is_empty() {
-                            parsed_contents.push(word.clone());
-                            word.clear();
-                        }
                     }
                 },
 
-                _ => {
+                ' ' | '\n' => 
+
+                {if char == '\n' {if ignore_until_n { ignore_until_n = false};};
+                    if !ignore_until_n {
+                        if inside_single_string || inside_double_string {
+
+                            word.push(char); 
+                        } else {
+                            if !word.is_empty() {
+                                parsed_contents.push(word.clone());
+                                word.clear();
+                            }
+                        }
+                    }   
+                },
+
+                _ => if !ignore_until_n {
                     word.push(char);
                 }
         }
