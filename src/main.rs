@@ -14,8 +14,7 @@ fn main() {
     let parsed_contents = reader::parse_contents(contents);
 
     println!("{:?}", parsed_contents);
-    // still need to add comments
-    // and think more about everything so i get done with keywords and stuff
+
     let tokenized = tokenizer::tokenize(parsed_contents);
     // test
     for token in &tokenized {
