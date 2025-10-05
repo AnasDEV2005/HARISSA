@@ -69,5 +69,8 @@ This “copy on surface, borrow in secret” model keeps code readable while rem
 Now im thinking i need to add comments
 and maybe add the tokens for other stuff, other features i guess.
 - 26 sep 2025 | added the possibility to ignore comments and dealt with the newline issue (i was splitting elements by whitespace only)
-- 
+- 27 sep - 5 oct 2025 | made the tokenizer, fixed some stuff, wrote syntax tree, started with converting token stream into syntax tree
+this is looking complicated
+alot of ifs and matches
+so it will take time i think
 

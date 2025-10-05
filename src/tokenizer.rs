@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Token {
     Keyword(String),
     Identifier(String),
@@ -28,7 +28,7 @@ pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
                 number if number.chars().all(|number| number.is_ascii_digit()) => { 
                     tokens.push(Token::Number(element.to_string()));
                     previous = element.to_string();
-                },
+            },
 
                 "const" | "while" | "for" | "where" | "if" | "else" | "elif" | "fn" | "pub" => {
                     tokens.push(Token::Keyword(element.to_string()));

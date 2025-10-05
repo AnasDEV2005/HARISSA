@@ -4,7 +4,13 @@ use std::fs;
 use std::process::Command;
 
 
+
+
+
+
+
 pub fn normalize_input(input: &str) -> String {
+    // Define the set of single-character operators/symbols you care about
     let symbols: [char; 24] = [
         ':', '=', '+', '-', '/', '*', '%', '|', '&', '?',
         '[', ']', '{', '}', '(', ')', '#', '>', '<', ',',
@@ -28,11 +34,25 @@ pub fn normalize_input(input: &str) -> String {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// Write a String to a file (overwriting if it exists)
 pub fn write_file(path: &str, content: &str) -> Result<(), std::io::Error> {
     fs::write(path, content)
 }
 
-
+/// Invoke `rustc` on the given .rs file (errors printed to console)
 pub fn compile_rust(source_rs: &str) {
     let output = Command::new("rustc")
         .arg(source_rs)
