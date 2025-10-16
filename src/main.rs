@@ -13,12 +13,16 @@ fn main() {
     
     let parsed_contents = reader::parse_contents(contents);
 
-    println!("{:?}", parsed_contents);
+   // println!("{:?}", parsed_contents);
 
-    let tokenized = tokenizer::tokenize(parsed_contents);
+    let tokens = tokenizer::tokenize(parsed_contents);
     // test
-    for token in &tokenized {
-        println!("{:?}", token);
-    }
+    // for token in &tokenized { println!("{:?}", token); }
+    let mut parser = parser::Parser {
+        tokens: tokens,
+        position: 0
+    };
+
+    let parsed = parser.parse();
 }
 

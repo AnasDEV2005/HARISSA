@@ -1,57 +1,151 @@
+
 use crate::syntaxtree::{Statement, Expression};
 use crate::tokenizer::Token;
 
 #[derive(Debug)]
 pub struct Parser {
-    tokens: Vec<Token>,
-    position: usize,
+    pub tokens: Vec<Token>,
+    pub position: usize,
 }
 
 impl Parser {
-
-// what im supposed to do here is, iterate over all the tokens, send them to parse_statement, while
-// keeping track of the position
-//
-//
     pub fn parse(&mut self) -> Vec<Statement> {
         let mut statements = Vec::new();
-        let tokens: Vec<Token> = self.tokens.clone();
-        for token in tokens.iter() {
-            let t = token.clone();
-            let stmt = self.parse_statements(t);
+        while self.position < self.tokens.len() {
+            let token = self.tokens[self.position].clone();
+            let stmt = self.parse_statement(token);
             statements.push(stmt);
             self.position += 1;
         }
         statements
     }
 
-    pub fn parse_statements(&mut self, token: Token) -> Statement  {
-
+    pub fn parse_statement(&mut self, token: Token) -> Statement {
         match token {
             Token::Number(n) => Statement::Expression(Expression::Number(n)),
             Token::String(s) => Statement::Expression(Expression::String(s)),
-            Token::Symbol(chr) => self.parse_symbol(chr, self.position),
             Token::Keyword(k) => self.parse_keyword(k, self.position),
-            Token::Identifier(i) => ,
-            Token::Boolean(b) => ,
-            Token::Operator(o) => ,
+            Token::Symbol(chr) => self.parse_symbol(chr, self.position),
+            Token::Identifier(i) => self.parse_identifier(i, self.position),
+            Token::Boolean(b) => Statement::ConstDeclaration {
+                name: "x".to_string(),
+                datatype: "int".to_string(),
+                value: Expression::Boolean(b),
+            },
+            Token::Operator(o) => self.parse_operator(o, self.position),
         }
-        Statement::ConstDeclaration { name: ("x".to_string()), datatype: ("int".to_string()), value: Expression::Number("5".to_string()) } 
     }
 
-
-    fn parse_symbol(&mut self, chr: char, pos: usize) -> Statement {
-        Statement::ConstDeclaration { name: ("x".to_string()), datatype: ("int".to_string()), value: Expression::Number("5".to_string()) } 
+    fn parse_keyword(&mut self, keyword: String, _pos: usize) -> Statement {
+        if keyword == "if" {
+            let condition = self.collect_condition();
+            let block = self.collect_block();
+            Statement::If {
+                condition: self.parse_condition(condition),
+                then_branch: Box::new(Statement::Block(self.parse_block(block))),
+                else_branch: None,
+            }
+        } else if keyword == "while" {
+            Statement::While {
+                condition: Expression::Identifier("cond".into()),
+                body: Box::new(Statement::Expression(Expression::Identifier("body".into()))),
+            }
+        } else if keyword == "fn" {
+            Statement::Function {
+                name: "f".into(),
+                params: vec![],
+                body: Box::new(Statement::Expression(Expression::Identifier("body".into()))),
+            }
+        } else if keyword == "const" {
+            Statement::ConstDeclaration {
+                name: "x".into(),
+                datatype: "int".into(),
+                value: Expression::Number("0".into()),
+            }
+        } else if keyword == "elif" {
+            Statement::Expression(Expression::Identifier("elif".into()))
+        } else {
+            Statement::Expression(Expression::Identifier("unknown".into()))
+        }
     }
 
+    fn parse_symbol(&mut self, _chr: char, _pos: usize) -> Statement {
+        Statement::Expression(Expression::Identifier("symbol".into()))
+    }
 
+    fn parse_identifier(&mut self, _identifier: String, _pos: usize) -> Statement {
+        Statement::Expression(Expression::Identifier("ident".into()))
+    }
 
+    fn parse_operator(&mut self, _operator: String, _pos: usize) -> Statement {
+        Statement::Expression(Expression::Identifier("operator".into()))
+    }
 
+    fn parse_expression(&mut self) -> Expression {
+        self.position += 1;
+        if self.position < self.tokens.len() {
+            match &self.tokens[self.position] {
+                Token::Number(n) => Expression::Number(n.clone()),
+                _ => Expression::Identifier("expr".into()),
+            }
+        } else {
+            Expression::Identifier("end".into())
+        }
+    }
 
+    fn parse_condition(&mut self, expr_vec: Vec<Token>) -> Expression {
+        Expression::Identifier("end".into())
+    }
 
+    fn collect_condition(&mut self) -> Vec<Token> {
+        let mut expr_tokens = Vec::new();
+        self.position += 1;
+        while self.position < self.tokens.len() {
+
+            //HACK: i dont quite understand this uh syntax but i know the whole point is to check
+            //if the token is a symbol and run a condition on the aforementioned symbol
+
+            if let Token::Symbol(c) = &self.tokens[self.position] {
+                if *c == '{' {
+                    break; // stop before block start
+                }
+            }
+            expr_tokens.push(self.tokens[self.position].clone());
+            self.position += 1;
+        }
+        println!("{:?}", expr_tokens);
+        expr_tokens
+    }
+
+    fn collect_block(&mut self) -> Vec<Token> {
+        let mut expr_tokens = Vec::new();
+        self.position += 1;
+        while self.position < self.tokens.len() {
+
+            //HACK: same as collect condition
+
+            if let Token::Symbol(c) = &self.tokens[self.position] {
+                if *c == '}' {
+                    break; // stop before block start
+                }
+            }
+            expr_tokens.push(self.tokens[self.position].clone());
+            self.position += 1;
+        }
+        println!("{:?}", expr_tokens);
+        expr_tokens
+    }
+
+    fn parse_block(&mut self, block: Vec<Token>) -> Vec<Statement> {
+        let mut pos = 0;
+        let mut statements = Vec::new();
+        while pos < block.len() {
+            let token = block[pos].clone();
+            let stmt = self.parse_statement(token);
+            statements.push(stmt);
+            pos += 1;
+        }
+        statements
+    }
 }
-
-
-
-
 
