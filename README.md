@@ -73,7 +73,7 @@ and maybe add the tokens for other stuff, other features i guess.
 this is looking complicated
 alot of ifs and matches
 so it will take time i think
-- 16 october | (lol i hate uni lol) working on the parser still. I thought it's be more complicated dealing with the nested stuff, but when i split stuff up in simple one-task conditions everything is clear and easy to understand. Makes the work so much easier.
+- 16 october | (lol i hate uni lol) working on the parser still. I thought it'd be more complicated dealing with the nested stuff, but when i split stuff up in simple one-task functions everything is clear and easy to understand. Makes the work so much easier.
 To sum it up, today i worked on parsing if statements.
 To clarify: the parsing will generate the ast which will be interpreted later.
 But it feels like the parsing stage is gonna take more time that interpreting. At least for the basic layer of the language. I will add all my ideas later when i have a proper base working. Though i need to keep in mind my future plans while programming such as to not be put in a situation where i have to refactor a big block of code. Splitting stuff up in functions helped with that
