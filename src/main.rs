@@ -17,7 +17,7 @@ fn main() {
 
     let tokens = tokenizer::tokenize(parsed_contents);
     // test
-    // for token in &tokenized { println!("{:?}", token); }
+    for token in &tokens { println!("{:?}", token); }
     let mut parser = parser::Parser {
         tokens: tokens,
         position: 0

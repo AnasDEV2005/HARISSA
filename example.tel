@@ -1,6 +1,6 @@
 // comment
 
-const L = "idk";
+const L == "idk";
 
 if condition {
   do sumn

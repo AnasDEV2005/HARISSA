@@ -8,51 +8,103 @@ TELL stands for “Textually Explicit and Lightweight Language.” It’s a comp
 
 
 
-## concept
+# Language Specification: [Language Name]
 
-TELL  intentionally avoids shorthand, magical behavior, and obscure syntax. Every line of code is meant to be readable, teachable, and obvious in function — even at the cost of verbosity.
+## 1. Overview
+- **Language name:** TELLC (subject to change) 
+- **Paradigm:** Expression-oriented, imperative–functional hybrid  
+- **Goal / Purpose:** im still doing some self-discovery :D  
+- **Execution model:** transpiled into rust  
+- **Typing:** Static 
+
+---
+
+## 2. Lexical Structure
+
+### 2.1 Tokens
+- **Identifiers:**  
+  Pattern: `[a-zA-Z_][a-zA-Z0-9_]*`
+- **Numbers:**  
+  Pattern: `[0-9]+(\.[0-9]+)?`
+- **Strings:**  
+  Pattern: `"[^"]*"`
+- **Booleans:**  
+  Keywords: `true`, `false`
+- **Symbols:**  
+  List: `() { } , ;`
+- **Operators:**  
+  List: `+ - * / = == != > < >= <= && || !`
+- **Keywords:**  
+  List: `if`, `else`, `while`, `fn`, `const`, `return`, `for ... in`
+
+### 2.2 Comments
+- **Single-line:** `// comment`
+- **Multi-line:** `/* comment */`
+
+---
+
+## 3. Syntax (Grammar)
+Use BNF or pseudocode to describe syntax rules.
+```rs
+run {
+    const string name = "your_name";
+    print(hello_world(name, 0));
+}
+
+// comment
+
+/*
+comment block
+*/
+
+fn hello_world(name string, count int): list {
+    list l = [];
+    
+    loop i -> count {
+        l.add(name)
+    };
+    
+    return l
+}
 
 
-
+```
 
 ## Error Handling
 
-the plan is to add the .except option to handle a function failing (if u dont know what happens inside the function)
-and for errors values, ill figure something out that ressembles that result or option features of rust
+```rs
+ERROR CASES { 
+    file_read: "Error reading file",
+    data_not_found(string): "Error data not found at {0}",
+}
 
+run {
+    print(get_data("header")); // implicitly unwraps the error so will PRINT an error if file_text = error, and all std funcs that return something, will return an error.
+
+    print(file_text("file.txt").except(handle_missing_file)); // this is to deal manually with the error
+}
+
+fn file_text(filename string): string {
+    return std.file.read(filename);
+}
+
+fn get_data(header string): int {
+    return db.find(header)#data_not_found(header); // to apply error case to a function
+}
+
+
+```
 
 ## Standard Library
-
-i dont want crate importing hell so, the standard library:
 
 - Input/output operations  
 - Math and string utilities  
 - Lists, dictionaries, and tuples  
 - File and system tools  
-- Date and time support (i dont remember saying that one dawg)
 
-(no idea how to implement the math stuff but oh well)
-
-## ideas
+### random thoughts 
   
-- type annotations on definitions (not obligated)
-
-- my code is supposed to deal with the borrowing system, so the programmer can assign stuff with less worry
-
-- function with defined argument and return types  
-
 - i wanna take some stuff from ocaml's type system
-
-
-The transpiler tracks how values are used:  
-- If used once, they are moved directly.  
-- If reused without mutation, an internal reference is used.  
-- If reused with mutation, a mutable reference is used.  
-- If usage would break Rust’s rules, a safe clone is inserted.  
-sounds useful so imma keep it but this was ai
-(not very sure about this part, still fleshing out the idea)
-
-This “copy on surface, borrow in secret” model keeps code readable while remaining performant and memory-safe.
 
 ---
 
@@ -77,4 +129,6 @@ so it will take time i think
 To sum it up, today i worked on parsing if statements.
 To clarify: the parsing will generate the ast which will be interpreted later.
 But it feels like the parsing stage is gonna take more time that interpreting. At least for the basic layer of the language. I will add all my ideas later when i have a proper base working. Though i need to keep in mind my future plans while programming such as to not be put in a situation where i have to refactor a big block of code. Splitting stuff up in functions helped with that
-
+TODO: 
+- /* */ comment blocks
+- 
