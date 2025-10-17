@@ -1,5 +1,5 @@
 
-use crate::syntaxtree::{Statement, Expression};
+use crate::syntaxtree::{Statement, Expression, LoopRange};
 use crate::tokenizer::Token;
 
 #[derive(Debug)]
@@ -7,6 +7,8 @@ pub struct Parser {
     pub tokens: Vec<Token>,
     pub position: usize,
 }
+
+
 
 impl Parser {
     pub fn parse(&mut self) -> Vec<Statement> {
@@ -39,7 +41,6 @@ impl Parser {
 
 
 
-
     fn parse_keyword(&mut self, keyword: String, _pos: usize) -> Statement {
         match keyword.as_str() {
             "if" => {
@@ -51,6 +52,11 @@ impl Parser {
                     else_branch: None,
                 }
             }
+
+            // iterator: checks if there is an identifier after impl Trait for Type 
+            // range: either, length of the variable after the iterator, or the range specified
+            
+            "loop" => self.parse_loop(),
 
             "while" => Statement::While {
                 condition: Expression::Identifier("cond".into()),
@@ -70,8 +76,6 @@ impl Parser {
             },
 
             "elif" => Statement::Expression(Expression::Identifier("elif".into())),
-
-            "loop" => Statement::Expression(Expression::Identifier("loop".into())),
 
             "string" => Statement::Expression(Expression::Identifier("string".into())),
 
@@ -170,6 +174,50 @@ impl Parser {
             pos += 1;
         }
         statements
+    }
+
+
+    fn determine_range(&mut self) -> u8 {
+        0
+    }
+
+    fn parse_loop(&mut self) -> Statement {
+        self.position += 1;
+
+        let mut iterator = None;
+        let mut range = None;
+
+        // check if next token is an identifier → "loop i -> count"
+        if let Some(Token::Identifier(name)) = self.tokens.get(self.position) {
+            iterator = Some(name.clone());
+            self.position += 1;
+
+            // check for ->
+            if let Some(Token::Symbol('-')) = self.tokens.get(self.position) {
+                self.position += 1; // skip '-'
+                if let Some(Token::Symbol('>')) = self.tokens.get(self.position) {
+                    self.position += 1;
+                    range = self.collect_range();
+                }
+            }
+        }
+
+        // now collect the body normally
+        let block = self.collect_block();
+        Statement::Loop {
+            iterator: iterator,
+
+            range: range,
+            body: Box::new(Statement::Block(self.parse_block(block))),
+        }
+    }
+
+    fn collect_range(&mut self) -> Option<LoopRange> {
+
+    }
+
+    fn get_iterator(&mut self) -> Option<String> {
+
     }
 }
 

@@ -30,6 +30,12 @@ pub enum Expression {
 }
 
 
+#[derive(Debug)]
+pub enum LoopRange {
+    Number(i64),
+    Identifier(String),
+    List(Vec<Expression>),
+}
 // statement is a key word that does something
 #[derive(Debug)]
 pub enum Statement {
@@ -55,6 +61,14 @@ pub enum Statement {
         then_branch: Box<Statement>,
         else_branch: Option<Box<Statement>>,
     },
+
+
+    Loop {
+        iterator: Option<String>,       // e.g., "i" (or None for plain `loop`)
+        range: Option<LoopRange>,      // e.g., Expression::Identifier("count")
+        body: Box<Statement>,           // usually a Block
+    },
+
 
     While {
         condition: Expression,

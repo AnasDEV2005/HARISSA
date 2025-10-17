@@ -67,9 +67,9 @@ fn hello_world(name string, count int): list {
     return l
 }
 
-object Woman {
+object Person {
     Age: int,
-    Cooking: int,
+    Alive: bool,
 }
 
 ```
@@ -129,10 +129,15 @@ and maybe add the tokens for other stuff, other features i guess.
 this is looking complicated
 alot of ifs and matches
 so it will take time i think
+
 - 16 october | (lol i hate uni lol) working on the parser still. I thought it'd be more complicated dealing with the nested stuff, but when i split stuff up in simple one-task functions everything is clear and easy to understand. Makes the work so much easier.
 To sum it up, today i worked on parsing if statements.
 To clarify: the parsing will generate the ast which will be interpreted later.
 But it feels like the parsing stage is gonna take more time that interpreting. At least for the basic layer of the language. I will add all my ideas later when i have a proper base working. Though i need to keep in mind my future plans while programming such as to not be put in a situation where i have to refactor a big block of code. Splitting stuff up in functions helped with that
 TODO: 
 - /* */ comment blocks
-- 
+
+- 17 october | wrote a cleaner readme, with the language specification and cleared up what i had in mind for the syntax (obviously still subject to change but yeah)
+also more on the parser, after finishing the if statement parsing i moved onto the loop parsing.
+it might end up needing more work to be honest because for the range of the loop i would need to check in the syntax tree for the variable specified as range. could be an int, a list or a string, so, would need more work outside just parsing.
+
