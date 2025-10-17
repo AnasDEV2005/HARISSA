@@ -177,9 +177,7 @@ impl Parser {
     }
 
 
-    fn determine_range(&mut self) -> u8 {
-        0
-    }
+
 
     fn parse_loop(&mut self) -> Statement {
         self.position += 1;
@@ -197,7 +195,7 @@ impl Parser {
                 self.position += 1; // skip '-'
                 if let Some(Token::Symbol('>')) = self.tokens.get(self.position) {
                     self.position += 1;
-                    range = self.collect_range();
+                    range = Some(self.collect_range());
                 }
             }
         }
@@ -212,12 +210,26 @@ impl Parser {
         }
     }
 
-    fn collect_range(&mut self) -> Option<LoopRange> {
+    fn collect_range(&mut self) -> LoopRange {
+        let mut expr_tokens = Vec::new();
+        self.position += 1;
+        while self.position < self.tokens.len() {
+            //HACK: 
+            if let Token::Symbol(c) = &self.tokens[self.position] {
+                if *c == '{' {
+                    break; // stop before block start
+                }
+            }
+            expr_tokens.push(self.tokens[self.position].clone());
+            self.position += 1;
+        }
+        LoopRange::Number(1)
 
     }
 
     fn get_iterator(&mut self) -> Option<String> {
 
+        Some("placeholder".to_string())
     }
 }
 
