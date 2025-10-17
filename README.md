@@ -8,7 +8,7 @@ TELL stands for “Textually Explicit and Lightweight Language.” It’s a comp
 
 
 
-# Language Specification: [Language Name]
+# Language Specification: TELL
 
 ## 1. Overview
 - **Language name:** TELLC (subject to change) 
@@ -67,6 +67,10 @@ fn hello_world(name string, count int): list {
     return l
 }
 
+object Woman {
+    Age: int,
+    Cooking: int,
+}
 
 ```
 

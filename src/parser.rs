@@ -36,38 +36,62 @@ impl Parser {
         }
     }
 
+
+
+
+
     fn parse_keyword(&mut self, keyword: String, _pos: usize) -> Statement {
-        if keyword == "if" {
-            let condition = self.collect_condition();
-            let block = self.collect_block();
-            Statement::If {
-                condition: self.parse_condition(condition),
-                then_branch: Box::new(Statement::Block(self.parse_block(block))),
-                else_branch: None,
+        match keyword.as_str() {
+            "if" => {
+                let condition = self.collect_condition();
+                let block = self.collect_block();
+                Statement::If {
+                    condition: self.parse_condition(condition),
+                    then_branch: Box::new(Statement::Block(self.parse_block(block))),
+                    else_branch: None,
+                }
             }
-        } else if keyword == "while" {
-            Statement::While {
+
+            "while" => Statement::While {
                 condition: Expression::Identifier("cond".into()),
                 body: Box::new(Statement::Expression(Expression::Identifier("body".into()))),
-            }
-        } else if keyword == "fn" {
-            Statement::Function {
+            },
+
+            "fn" => Statement::Function {
                 name: "f".into(),
                 params: vec![],
                 body: Box::new(Statement::Expression(Expression::Identifier("body".into()))),
-            }
-        } else if keyword == "const" {
-            Statement::ConstDeclaration {
+            },
+
+            "const" => Statement::ConstDeclaration {
                 name: "x".into(),
                 datatype: "int".into(),
                 value: Expression::Number("0".into()),
-            }
-        } else if keyword == "elif" {
-            Statement::Expression(Expression::Identifier("elif".into()))
-        } else {
-            Statement::Expression(Expression::Identifier("unknown".into()))
+            },
+
+            "elif" => Statement::Expression(Expression::Identifier("elif".into())),
+
+            "loop" => Statement::Expression(Expression::Identifier("loop".into())),
+
+            "string" => Statement::Expression(Expression::Identifier("string".into())),
+
+            "int" => Statement::Expression(Expression::Identifier("int".into())),
+
+            "list" => Statement::Expression(Expression::Identifier("list".into())),
+
+            "return" => Statement::Expression(Expression::Identifier("return".into())),
+
+            "object" => Statement::Expression(Expression::Identifier("object".into())),
+
+            "enum" => Statement::Expression(Expression::Identifier("object".into())),
+
+            _ => Statement::Expression(Expression::Identifier("unknown".into())),
         }
     }
+
+
+
+
 
     fn parse_symbol(&mut self, _chr: char, _pos: usize) -> Statement {
         Statement::Expression(Expression::Identifier("symbol".into()))
