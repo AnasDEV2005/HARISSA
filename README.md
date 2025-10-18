@@ -44,7 +44,6 @@ TELL stands for “Textually Explicit and Lightweight Language.” It’s a comp
 ---
 
 ## 3. Syntax (Grammar)
-Use BNF or pseudocode to describe syntax rules.
 ```rs
 run {
     const string name = "your_name";
@@ -140,4 +139,10 @@ TODO:
 - 17 october | wrote a cleaner readme, with the language specification and cleared up what i had in mind for the syntax (obviously still subject to change but yeah)
 also more on the parser, after finishing the if statement parsing i moved onto the loop parsing.
 it might end up needing more work to be honest because for the range of the loop i would need to check in the syntax tree for the variable specified as range. could be an int, a list or a string, so, would need more work outside just parsing.
+- 18 october | RAAAAAHH im almost done with parsing the loop. finished parsing the range, which is the hardest part
+look at this beauty 
+```rust
+Loop { iterator: Some("i"), range: Some(Range((0, 1))), body: Block(I can only finish parsing blocks when im done parsing all the keywords and expressions so tthis will remain rough until i finish parsing pretty much) }
+```
+good day 
 

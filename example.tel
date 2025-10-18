@@ -2,6 +2,11 @@
 
 const L == "idk";
 
+loop i -> (0, 1) {
+  whatever;
+}
+
+
 if condition {
   do sumn
 }

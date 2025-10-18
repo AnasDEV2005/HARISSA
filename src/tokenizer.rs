@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Keyword(String),
     Identifier(String),
@@ -30,7 +30,7 @@ pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
                     previous = element.to_string();
             },
 
-                "const" | "while" | "for" | "where" | "if" | "else" | "elif" | "fn" | "pub" => {
+                "const" | "while" | "for" | "where" | "if" | "else" | "elif" | "fn" | "pub" | "loop" => {
                     tokens.push(Token::Keyword(element.to_string()));
                     previous = element.to_string();
                 },

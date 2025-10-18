@@ -33,10 +33,12 @@ pub enum Expression {
 #[derive(Debug)]
 pub enum LoopRange {
     Number(i64),
+    Range((i64, i64)),
     Identifier(String),
     List(Vec<Expression>),
 }
-// statement is a key word that does something
+
+
 #[derive(Debug)]
 pub enum Statement {
 

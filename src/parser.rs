@@ -56,7 +56,7 @@ impl Parser {
             // iterator: checks if there is an identifier after impl Trait for Type 
             // range: either, length of the variable after the iterator, or the range specified
             
-            "loop" => self.parse_loop(),
+            "loop" => {println!("{:?}", self.parse_loop()); return self.parse_loop()},
 
             "while" => Statement::While {
                 condition: Expression::Identifier("cond".into()),
@@ -141,10 +141,14 @@ impl Parser {
             expr_tokens.push(self.tokens[self.position].clone());
             self.position += 1;
         }
-        println!("{:?}", expr_tokens);
+        // println!("{:?}", expr_tokens);
         expr_tokens
     }
 
+
+
+//----------------------------------------------------------------------------
+    // BLOCK
     fn collect_block(&mut self) -> Vec<Token> {
         let mut expr_tokens = Vec::new();
         self.position += 1;
@@ -160,7 +164,7 @@ impl Parser {
             expr_tokens.push(self.tokens[self.position].clone());
             self.position += 1;
         }
-        println!("{:?}", expr_tokens);
+        // println!("{:?}", expr_tokens);
         expr_tokens
     }
 
@@ -175,13 +179,19 @@ impl Parser {
         }
         statements
     }
+//------------------------------------------------------------------------------
 
 
 
 
+
+
+//--------------------------------------------------------------------------------
+    // LOOP
     fn parse_loop(&mut self) -> Statement {
         self.position += 1;
 
+        println!("parsing loop");
         let mut iterator = None;
         let mut range = None;
 
@@ -190,12 +200,15 @@ impl Parser {
             iterator = Some(name.clone());
             self.position += 1;
 
+            let dash = "-".to_string();
+            let greath = ">".to_string();
+
             // check for ->
-            if let Some(Token::Symbol('-')) = self.tokens.get(self.position) {
+            if let Some(Token::Operator(dash)) = self.tokens.get(self.position) {
                 self.position += 1; // skip '-'
-                if let Some(Token::Symbol('>')) = self.tokens.get(self.position) {
-                    self.position += 1;
+                if let Some(Token::Operator(greath)) = self.tokens.get(self.position) {
                     range = Some(self.collect_range());
+                    println!("{:?}", range);
                 }
             }
         }
@@ -210,11 +223,15 @@ impl Parser {
         }
     }
 
+
+    // figure out how to look through the vector of tokens that are gonna be the range
+    // and decide if its a total range, a list of something, a tuple range (2, 8) or a string
+    //
     fn collect_range(&mut self) -> LoopRange {
         let mut expr_tokens = Vec::new();
         self.position += 1;
         while self.position < self.tokens.len() {
-            //HACK: 
+            
             if let Token::Symbol(c) = &self.tokens[self.position] {
                 if *c == '{' {
                     break; // stop before block start
@@ -223,7 +240,21 @@ impl Parser {
             expr_tokens.push(self.tokens[self.position].clone());
             self.position += 1;
         }
-        LoopRange::Number(1)
+        
+        match expr_tokens.as_slice() {
+            [Token::Symbol('('), Token::Number(a_str), Token::Symbol(','), Token::Number(b_str), Token::Symbol(')')] => {
+                if let (Ok(a), Ok(b)) = (a_str.parse::<i64>(), b_str.parse::<i64>()) {
+                    LoopRange::Range((a, b))
+                } else {
+                    LoopRange::Number(1) // fallback
+                }
+            }
+            [Token::Number(n_str)] => {
+                let n = n_str.parse::<i64>(); 
+                LoopRange::Number(Result::expect(n, "error with loop range ?"))
+            }
+            _ => LoopRange::Number(1),
+        }
 
     }
 
@@ -231,5 +262,7 @@ impl Parser {
 
         Some("placeholder".to_string())
     }
+    //----------------------------------------------------------------------------------------------------
+
 }
 
