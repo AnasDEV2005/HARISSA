@@ -76,7 +76,7 @@ object Person {
 ## Error Handling
 
 ```rs
-ERROR CASES { 
+$ERRORS { 
     file_read: "Error reading file",
     data_not_found(string): "Error data not found at {0}",
 }
