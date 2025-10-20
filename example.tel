@@ -1,12 +1,23 @@
 // comment
 
-const L == "idk";
+
+const L == "idk;
+
 
 loop i -> (0, 1) {
   whatever;
-}
 
 
-if condition {
-  do sumn
+!something;
+
+run {
+    const string name = "your_name";
+    print(hello_world(name, 0));
 }
+
+// comment
+
+/*
+comment block
+*/
+

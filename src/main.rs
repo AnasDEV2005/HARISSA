@@ -4,6 +4,7 @@ mod syntaxtree;
 mod tokenizer;
 mod interpreter;
 mod parser;
+mod errors;
 
 
 fn main() {
@@ -15,17 +16,31 @@ fn main() {
 
    // println!("{:?}", parsed_contents);
 
-    let tokens = tokenizer::tokenize(parsed_contents);
 
-    // test
-    // for token in &tokens { println!("{:?}", token); }
-    
+    let tokens = tokenizer::tokenize(parsed_contents);
+    if let Err(e) = tokenizer::validate_tokens(&tokens) {
+        println!("Syntax error: {:?}", e);
+        return;
+    }
+
+    for token in &tokens { println!("{:?}", token); }
+
     let mut parser = parser::Parser {
         tokens: tokens,
-        position: 0
+        position: 0,
+        syn_errors: vec![],
     };
 
     let parsed = parser.parse();
-    // println!("{:?}", parsed);
+    println!("{:?}", parsed);
+
+
+    // NOTE: need to finish scanning for lexical errors first
+    // then ill setup syntax error management
+    // and then ill continue parsing
+    
+    
+    
+    
 }
 

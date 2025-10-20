@@ -1,3 +1,7 @@
+use crate::reader::TokenPos;
+use crate::errors::SyntaxErrors;
+
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Keyword(String),
@@ -7,68 +11,73 @@ pub enum Token {
     Boolean(bool),
     Operator(String),
     Symbol(char),
+    WithPos(Box<Token>, usize, usize), // (actual token, line, column)
 }
 
 
-pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
-
+pub fn tokenize(parsed: Vec<TokenPos>) -> Vec<Token> {
     let mut tokens = Vec::new();
-    
-    let mut previous = String::new();
-    // to remind me to check previous token to determine if its an Identifier
 
-    for element in raw.iter() {
-        
-        if previous == "'" || previous == "\"" {
-            tokens.push(Token::String(element.to_string()));
-            previous = element.to_string();
-        } else {
-            match element.as_str() {
+    for item in parsed {
+        let token_value = item.value.as_str();
 
-                number if number.chars().all(|number| number.is_ascii_digit()) => { 
-                    tokens.push(Token::Number(element.to_string()));
-                    previous = element.to_string();
-            },
+        let token = match token_value {
+            "if" | "else" | "while" | "loop" | "const" | "fn" | "return" | "true" | "false" => {
+                Token::Keyword(token_value.to_string())
+            }
 
-                "const" | "while" | "for" | "where" | "if" | "else" | "elif" | "fn" | "pub" | "loop" => {
-                    tokens.push(Token::Keyword(element.to_string()));
-                    previous = element.to_string();
-                },
+            "=" | "+" | "-" | "*" | "/" | "%" | ">" | "<" | "==" | "!=" | ">=" | "<=" => {
+                Token::Operator(token_value.to_string())
+            }
 
-                "=" | "+" | "-" | "/" | "*" | "%" | "|" | "&" | ">" | "<" => {
-                    let c: char = element.chars().next().unwrap();
-                    tokens.push(Token::Operator(c.to_string()));
-                    previous = element.to_string();
-                },
+            "{" | "}" | "(" | ")" | "[" | "]" | ";" | "," | ":" | "." => {
+                Token::Symbol(token_value.chars().next().unwrap())
+            }
 
-                "\"" | "'" | ":" | "?" | "[" | "]" | "{" | "}" | "(" | ")" | "#" | "," | "." | "!" | ";" | "\\" | "\n" => {
-                    let c: char = element.chars().next().unwrap();
-                    tokens.push(Token::Symbol(c));
-                    previous = element.to_string();
-                }
+            _ if token_value.chars().all(|c| c.is_ascii_digit()) => {
+                Token::Number(token_value.to_string())
+            }
 
-                "true" | "false" => {
-                    let value = element == "true";
-                    tokens.push(Token::Boolean(value));
-                },
+            _ if token_value.starts_with('"') && token_value.ends_with('"') => {
+                Token::String(token_value.to_string())
+            }
 
-                string if (string.starts_with('"') && string.ends_with('"')) || (string.starts_with('\'') && string.ends_with('\'')) => {
-                    let content = &string[1..string.len() - 1];
-                    tokens.push(Token::String(content.to_string()));
-                    previous = element.to_string();
-                },
+            _ => Token::Identifier(token_value.to_string()),
+        };
+
+        tokens.push(Token::WithPos(Box::new(token), item.line, item.column));
+    }
+
+    tokens
+}
+ 
 
 
-
-                _ => {
-                    tokens.push(Token::Identifier(element.to_string()));
-                    previous = element.to_string();
+pub fn validate_tokens(tokens: &[Token]) -> Result<(), SyntaxErrors> {
+    for i in 0..tokens.len() {
+        if let Token::Symbol('\n') = tokens[i] {
+            // look at the previous token
+            if let Some(prev) = tokens.get(i.wrapping_sub(1)) {
+                // if previous isn't ';' or '}', that’s an error
+                match prev {
+                    Token::Symbol(';') | Token::Symbol('}') => (),
+                    _ => return Err(SyntaxErrors::MissingSEMICOLON("Expected ';' before newline".into())),
                 }
             }
         }
     }
-    tokens
-} 
+
+    // also check for unclosed blocks
+    let open_braces = tokens.iter().filter(|t| matches!(t, Token::Symbol('{'))).count();
+    let close_braces = tokens.iter().filter(|t| matches!(t, Token::Symbol('}'))).count();
+
+    if open_braces != close_braces {
+        return Err(SyntaxErrors::MissingCURLYBRACKET("Mismatched curly braces".into()));
+    }
+
+    Ok(())
+}
+
 
 
 
