@@ -145,5 +145,13 @@ look at this beauty
 Loop { iterator: Some("i"), range: Some(Range((0, 1))), body: Block(x) }
 ```
 x = I can only finish parsing blocks when im done parsing all the keywords and expressions so tthis will remain rough until i finish parsing pretty much
-good day 
+good day
+
+- 19 october | i realized i needed to start working on the management of errors from the earlier stages too... time to look at older code... :sob:
+
+- 20 october | this turned out to be a big headache tbh. but, i think its worth it. Im glad im doing this now, rather than having to go back and do the syntax errors thing after ive added alotta complexity.
+what i had to do, after some thorough deliberation with my consultant (chatGPT) was to put \n back into the token stream so i can check if identifiers, or numbers, or strings, have a new line after them 
+(because lines in this language are seperated by ';').
+<br>
+lol, turns out i was reading string literals as identifiers. now that thats corrected, i think i can safely (hopefully) stop editing the scanner (seriousely, i dont wanna touch that again...)
 

@@ -1,4 +1,3 @@
-
 use std::fs;
 
 pub fn read_file(file_path: &str) -> String {
@@ -30,91 +29,110 @@ pub fn parse_contents(contents: String) -> Vec<TokenPos> {
     let mut i = 0;
 
     while i < chars.len() {
-        let char = chars[i];
+        let ch = chars[i];
         column += 1;
 
-        // track newlines globally
-        if char == '\n' {
+        // track newlines
+        if ch == '\n' {
             line += 1;
             column = 0;
         }
 
         // handle block comments
         if inside_block_comment {
-            if char == '*' && i + 1 < chars.len() && chars[i + 1] == '/' {
+            if ch == '*' && i + 1 < chars.len() && chars[i + 1] == '/' {
                 inside_block_comment = false;
-                i += 1; // skip '/'
+                i += 1;
             }
             i += 1;
             continue;
         }
 
-        match char {
-            '/' => {
+        //=============================
+        // COMMENT HANDLING
+        //=============================
+        if !inside_single_string && !inside_double_string {
+            if ch == '/' {
                 if slash {
-                    ignore_until_n = true; // start line comment //
+                    ignore_until_n = true;
                     slash = false;
                 } else if i + 1 < chars.len() && chars[i + 1] == '*' {
-                    inside_block_comment = true; // start block comment /*
-                    i += 1; // skip '*'
+                    inside_block_comment = true;
+                    i += 1;
                 } else {
                     slash = true;
                 }
+                i += 1;
+                continue;
+            } else {
+                slash = false;
             }
+        }
 
-            '\'' => if !ignore_until_n {
-                if !inside_double_string {
-                    if inside_single_string {
-                        push_token(&mut parsed_contents, &word, line, column);
-                        word.clear();
-                        push_token(&mut parsed_contents, &"'".to_string(), line, column);
-                        inside_single_string = false;
-                    } else {
-                        word.clear();
-                        push_token(&mut parsed_contents, &"'".to_string(), line, column);
-                        inside_single_string = true;
-                    }
-                } else {
-                    word.push(char);
-                }
-            }
-
-            '"' => if !ignore_until_n {
-                if !inside_single_string {
+        //=============================
+        // STRING HANDLING (quotes INCLUDED)
+        //=============================
+        match ch {
+            '"' => {
+                if !ignore_until_n {
+                    word.push(ch); // always include the quote itself
                     if inside_double_string {
+                        // closing double quote
                         push_token(&mut parsed_contents, &word, line, column);
                         word.clear();
-                        push_token(&mut parsed_contents, &"\"".to_string(), line, column);
                         inside_double_string = false;
-                    } else {
-                        word.clear();
-                        push_token(&mut parsed_contents, &"\"".to_string(), line, column);
+                    } else if !inside_single_string {
+                        // opening double quote
                         inside_double_string = true;
                     }
-                } else {
-                    word.push(char);
                 }
             }
 
-            ':' | '=' | '+' | '-' | '*' | '%' | '|' | '&' | '?' | '[' | ']' | '{' | '}' | '(' | ')' | '#' | '>' | '<' | ',' | '.' | '!' | ';' | '\\' => if !ignore_until_n {
+            '\'' => {
+                if !ignore_until_n {
+                    word.push(ch); // include the quote itself
+                    if inside_single_string {
+                        // closing single quote
+                        push_token(&mut parsed_contents, &word, line, column);
+                        word.clear();
+                        inside_single_string = false;
+                    } else if !inside_double_string {
+                        // opening single quote
+                        inside_single_string = true;
+                    }
+                }
+            }
+
+            ':' | '=' | '+' | '-' | '*' | '%' | '|' | '&' | '?' | '[' | ']' | '{' | '}' | '(' | ')' | '#' | '>' | '<' | ',' | '.' | '!' | ';' | '\\'
+                if !ignore_until_n =>
+            {
                 if inside_single_string || inside_double_string {
-                    word.push(char);
+                    word.push(ch);
                 } else {
                     if !word.is_empty() {
                         push_token(&mut parsed_contents, &word, line, column);
+                        word.clear();
                     }
-                    push_token(&mut parsed_contents, &char.to_string(), line, column);
-                    word.clear();
+                    push_token(&mut parsed_contents, &ch.to_string(), line, column);
                 }
             }
 
             ' ' | '\n' => {
-                if char == '\n' && ignore_until_n {
+                if ch == '\n' && ignore_until_n {
                     ignore_until_n = false;
                 }
+
+                if ch == '\n' && !inside_single_string && !inside_double_string {
+                    if !word.is_empty() {
+                        push_token(&mut parsed_contents, &word.clone().as_str(), line, column);
+                        word.clear();
+                    }
+                    push_token(&mut parsed_contents, "\\n", line, column);
+                }
+
                 if !ignore_until_n {
                     if inside_single_string || inside_double_string {
-                        word.push(char);
+                        word.push(ch);
                     } else if !word.is_empty() {
                         push_token(&mut parsed_contents, &word, line, column);
                         word.clear();
@@ -122,8 +140,12 @@ pub fn parse_contents(contents: String) -> Vec<TokenPos> {
                 }
             }
 
-            _ => if !ignore_until_n {
-                word.push(char);
+            _ => {
+                if inside_single_string || inside_double_string {
+                    word.push(ch);
+                } else if !ignore_until_n {
+                    word.push(ch);
+                }
             }
         }
 

@@ -1,7 +1,8 @@
 // comment
 
 
-const L == "idk;
+const L
+== "idk;
 
 
 loop i -> (0, 1) {

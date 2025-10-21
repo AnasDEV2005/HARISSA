@@ -53,26 +53,52 @@ pub fn tokenize(parsed: Vec<TokenPos>) -> Vec<Token> {
  
 
 
-pub fn validate_tokens(tokens: &[Token]) -> Result<(), SyntaxErrors> {
-    for i in 0..tokens.len() {
-        if let Token::Symbol('\n') = tokens[i] {
-            // look at the previous token
-            if let Some(prev) = tokens.get(i.wrapping_sub(1)) {
-                // if previous isn't ';' or '}', that’s an error
-                match prev {
-                    Token::Symbol(';') | Token::Symbol('}') => (),
-                    _ => return Err(SyntaxErrors::MissingSEMICOLON("Expected ';' before newline".into())),
+pub fn validate_tokens(tokens: Vec<Token>) -> Result<(), SyntaxErrors> {
+    let mut i = 0;
+
+    while i < tokens.len() {
+        match &tokens[i] {
+            Token::String(_) => {
+
+                //NOTE: this says "if this STRING is the last token, then something is wrong"
+                if i + 1 >= tokens.len() {
+                    return Err(SyntaxErrors::MissingSEMICOLON(
+                        "expected ) or , or ; or }... found something".to_string(),
+                    ));
+                }
+
+// if it isnt, i check if the next token is valid
+                match &tokens[i + 1] {
+                    Token::Keyword(_) | Token::Identifier(_) => {
+                        return Err(SyntaxErrors::MissingSEMICOLON(
+                            "expected ) or , or ; or }... found something".to_string(),
+                        ));
+                    }
+                    _ => {}
                 }
             }
+
+            Token::Identifier(identifier) => {
+
+                //NOTE: this says "if this IDENTIFIER is the last token, then something is wrong"
+                if i + 1 >= tokens.len() {
+                    return Err(SyntaxErrors::MissingSEMICOLON(
+                        "expected ) or , or ; or }... found something".to_string(),
+                    ));
+                }
+
+// if it isnt, i check if the next token is valid
+                if identifier.contains('\n') {
+                    return Err(SyntaxErrors::MissingSEMICOLON(
+                        "identifier contains newline".to_string(),
+                    ));
+                }
+            }
+
+            _ => {}
         }
-    }
 
-    // also check for unclosed blocks
-    let open_braces = tokens.iter().filter(|t| matches!(t, Token::Symbol('{'))).count();
-    let close_braces = tokens.iter().filter(|t| matches!(t, Token::Symbol('}'))).count();
-
-    if open_braces != close_braces {
-        return Err(SyntaxErrors::MissingCURLYBRACKET("Mismatched curly braces".into()));
+        i += 1; // ✅ only once per loop
     }
 
     Ok(())
