@@ -147,3 +147,6 @@ Loop { iterator: Some("i"), range: Some(Range((0, 1))), body: Block(x) }
 x = I can only finish parsing blocks when im done parsing all the keywords and expressions so tthis will remain rough until i finish parsing pretty much
 good day 
 
+- 22 october | alot of random duct-taping and now i got it to pick up on newline and eof bytes inside strings and and report an invalid token at it.
+Honestly the tokenizer and parser are cooked and i'll definetly refactor them later but for now i want to get this somewhat up and running so i can implement all my ideas into the interpreter (before i forget them :sob: )
+
