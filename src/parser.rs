@@ -1,16 +1,22 @@
-
 use crate::syntaxtree::{Statement, Expression, LoopRange};
 use crate::tokenizer::Token;
+use crate::errors::SyntaxErrors;
+
+
 
 #[derive(Debug)]
 pub struct Parser {
     pub tokens: Vec<Token>,
     pub position: usize,
+    pub syn_errors: Vec<SyntaxErrors>,
 }
 
 
 
 impl Parser {
+    //=====================================================================
+    // 🧩 ENTRY POINT
+    //=====================================================================
     pub fn parse(&mut self) -> Vec<Statement> {
         let mut statements = Vec::new();
         while self.position < self.tokens.len() {
@@ -22,7 +28,26 @@ impl Parser {
         statements
     }
 
-    pub fn parse_statement(&mut self, token: Token) -> Statement {
+    fn unwrap_token(&mut self, token: Token) -> Token {
+        let token = match token {
+            Token::WithPos(inner, _line, _col) => *inner, // ignore position for now
+            other => other,
+        };
+        token
+    }
+
+    //=====================================================================
+    // 🧠 PARSERS
+    //=====================================================================
+
+    pub fn parse_statement(&mut self, token_wrapped: Token) -> Statement {
+
+        let token = self.unwrap_token(token_wrapped);
+
+
+
+
+
         match token {
             Token::Number(n) => Statement::Expression(Expression::Number(n)),
             Token::String(s) => Statement::Expression(Expression::String(s)),
@@ -42,9 +67,9 @@ impl Parser {
         }
     }
 
-
-
-
+    //---------------------------------------------------------------------
+    // KEYWORDS
+    //---------------------------------------------------------------------
     fn parse_keyword(&mut self, keyword: String, _pos: usize) -> Statement {
         match keyword.as_str() {
             "if" => {
@@ -57,10 +82,10 @@ impl Parser {
                 }
             }
 
-            // iterator: checks if there is an identifier after impl Trait for Type 
-            // range: either, length of the variable after the iterator, or the range specified
-            
-            "loop" => {println!("{:?}", self.parse_loop()); return self.parse_loop()},
+            "loop" => {
+                println!("{:?}", self.parse_loop());
+                return self.parse_loop();
+            }
 
             "while" => Statement::While {
                 condition: Expression::Identifier("cond".into()),
@@ -80,28 +105,21 @@ impl Parser {
             },
 
             "elif" => Statement::Expression(Expression::Identifier("elif".into())),
-
             "string" => Statement::Expression(Expression::Identifier("string".into())),
-
             "int" => Statement::Expression(Expression::Identifier("int".into())),
-
             "list" => Statement::Expression(Expression::Identifier("list".into())),
-
             "return" => Statement::Expression(Expression::Identifier("return".into())),
-
             "object" => Statement::Expression(Expression::Identifier("object".into())),
-
             "enum" => Statement::Expression(Expression::Identifier("object".into())),
-
             _ => Statement::Expression(Expression::Identifier("unknown".into())),
         }
     }
 
-
-
-
-
+    //---------------------------------------------------------------------
+    // SYMBOLS, IDENTIFIERS, OPERATORS
+    //---------------------------------------------------------------------
     fn parse_symbol(&mut self, _chr: char, _pos: usize) -> Statement {
+        self.syn_errors.push(SyntaxErrors::MissingSEMICOLON("MISSING SEMI COLUMN".to_string()));
         Statement::Expression(Expression::Identifier("symbol".into()))
     }
 
@@ -113,6 +131,9 @@ impl Parser {
         Statement::Expression(Expression::Identifier("operator".into()))
     }
 
+    //---------------------------------------------------------------------
+    // EXPRESSIONS & CONDITIONS
+    //---------------------------------------------------------------------
     fn parse_expression(&mut self) -> Expression {
         self.position += 1;
         if self.position < self.tokens.len() {
@@ -125,50 +146,47 @@ impl Parser {
         }
     }
 
-    fn parse_condition(&mut self, expr_vec: Vec<Token>) -> Expression {
+    fn parse_condition(&mut self, _expr_vec: Vec<Token>) -> Expression {
         Expression::Identifier("end".into())
     }
 
+    //=====================================================================
+    // 📦 COLLECTORS
+    //=====================================================================
+
+    //---------------------------------------------------------------------
+    // CONDITION
+    //---------------------------------------------------------------------
     fn collect_condition(&mut self) -> Vec<Token> {
         let mut expr_tokens = Vec::new();
         self.position += 1;
         while self.position < self.tokens.len() {
-
-            //HACK: i dont quite understand this uh syntax but i know the whole point is to check
-            //if the token is a symbol and run a condition on the aforementioned symbol
-
             if let Token::Symbol(c) = &self.tokens[self.position] {
                 if *c == '{' {
-                    break; // stop before block start
+                    break;
                 }
             }
             expr_tokens.push(self.tokens[self.position].clone());
             self.position += 1;
         }
-        // println!("{:?}", expr_tokens);
         expr_tokens
     }
 
-
-
-//----------------------------------------------------------------------------
+    //---------------------------------------------------------------------
     // BLOCK
+    //---------------------------------------------------------------------
     fn collect_block(&mut self) -> Vec<Token> {
         let mut expr_tokens = Vec::new();
         self.position += 1;
         while self.position < self.tokens.len() {
-
-            //HACK: same as collect condition
-
             if let Token::Symbol(c) = &self.tokens[self.position] {
                 if *c == '}' {
-                    break; // stop before block start
+                    break;
                 }
             }
             expr_tokens.push(self.tokens[self.position].clone());
             self.position += 1;
         }
-        // println!("{:?}", expr_tokens);
         expr_tokens
     }
 
@@ -183,15 +201,42 @@ impl Parser {
         }
         statements
     }
-//------------------------------------------------------------------------------
 
+    //---------------------------------------------------------------------
+    // RANGE
+    //---------------------------------------------------------------------
+    fn collect_range(&mut self) -> LoopRange {
+        let mut expr_tokens = Vec::new();
+        self.position += 1;
+        while self.position < self.tokens.len() {
+            if let Token::Symbol(c) = &self.tokens[self.position] {
+                if *c == '{' {
+                    break;
+                }
+            }
+            expr_tokens.push(self.tokens[self.position].clone());
+            self.position += 1;
+        }
 
+        match expr_tokens.as_slice() {
+            [Token::Symbol('('), Token::Number(a_str), Token::Symbol(','), Token::Number(b_str), Token::Symbol(')')] => {
+                if let (Ok(a), Ok(b)) = (a_str.parse::<i64>(), b_str.parse::<i64>()) {
+                    LoopRange::Range((a, b))
+                } else {
+                    LoopRange::Number(1)
+                }
+            }
+            [Token::Number(n_str)] => {
+                let n = n_str.parse::<i64>();
+                LoopRange::Number(Result::expect(n, "error with loop range ?"))
+            }
+            _ => LoopRange::Number(1),
+        }
+    }
 
-
-
-
-//--------------------------------------------------------------------------------
-    // LOOP
+    //=====================================================================
+    // 🔁 LOOP PARSER
+    //=====================================================================
     fn parse_loop(&mut self) -> Statement {
         self.position += 1;
 
@@ -220,53 +265,15 @@ impl Parser {
         // now collect the body normally
         let block = self.collect_block();
         Statement::Loop {
-            iterator: iterator,
-
-            range: range,
+            iterator,
+            range,
             body: Box::new(Statement::Block(self.parse_block(block))),
         }
     }
 
-
-    // figure out how to look through the vector of tokens that are gonna be the range
-    // and decide if its a total range, a list of something, a tuple range (2, 8) or a string
-    //
-    fn collect_range(&mut self) -> LoopRange {
-        let mut expr_tokens = Vec::new();
-        self.position += 1;
-        while self.position < self.tokens.len() {
-            
-            if let Token::Symbol(c) = &self.tokens[self.position] {
-                if *c == '{' {
-                    break; // stop before block start
-                }
-            }
-            expr_tokens.push(self.tokens[self.position].clone());
-            self.position += 1;
-        }
-        
-        match expr_tokens.as_slice() {
-            [Token::Symbol('('), Token::Number(a_str), Token::Symbol(','), Token::Number(b_str), Token::Symbol(')')] => {
-                if let (Ok(a), Ok(b)) = (a_str.parse::<i64>(), b_str.parse::<i64>()) {
-                    LoopRange::Range((a, b))
-                } else {
-                    LoopRange::Number(1) // fallback
-                }
-            }
-            [Token::Number(n_str)] => {
-                let n = n_str.parse::<i64>(); 
-                LoopRange::Number(Result::expect(n, "error with loop range ?"))
-            }
-            _ => LoopRange::Number(1),
-        }
-
-    }
-
-    fn get_iterator(&mut self) -> Option<String> {
-
-        Some("placeholder".to_string())
-    }
-    //----------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    // MISC HELPERS
+    //---------------------------------------------------------------------
 
 }
 

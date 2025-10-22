@@ -1,3 +1,7 @@
+use crate::reader::TokenPos;
+use crate::errors::SyntaxErrors;
+
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Keyword(String),
@@ -43,6 +47,25 @@ pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
                 current_string.push_str(s);
                 continue;
             }
+
+            Token::Identifier(identifier) => {
+
+                //NOTE: this says "if this IDENTIFIER is the last token, then something is wrong"
+                if i + 1 >= tokens.len() {
+                    return Err(SyntaxErrors::MissingSEMICOLON(
+                        "expected ) or , or ; or }... found something".to_string(),
+                    ));
+                }
+
+// if it isnt, i check if the next token is valid
+                if identifier.contains('\n') {
+                    return Err(SyntaxErrors::MissingSEMICOLON(
+                        "identifier contains newline".to_string(),
+                    ));
+                }
+            }
+
+            _ => {}
         }
 
         // opening a string
