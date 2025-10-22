@@ -12,12 +12,34 @@ pub enum Token {
 
 
 
+
+// NOTE: SYNTAX ERRORS TO CHECK BEFORE PARSING :
+/* 
+ 1. missing `;`
+ 2. \n and \0 in string (handle it)
+ 3. missing closing } or ] or ) (basically if delimiter open, and new line before closing delimiter, send error)
+ 4. invalid variable declaration character
+ 5. Unexpected token sequences
+       - Back-to-back incompatible tokens like:
+       - Two operators (++, ==+)
+       - Two keywords (const const)
+       - Identifier immediately followed by identifier without separator
+ 6. Dangling operators ( `const n = ;`)
+ 7. file ending inside an open delimiter
+ 8. maybe for comment blocks
+ 9. invalid keyword placement (`if true return;`)
+ 
+ */
+
+
+
+
+
 pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut inside_string = false;
     let mut current_string = String::new();
     let mut quote_char = '\0';
-    let mut i = 0;
 
     for element in raw.iter() {
         let s = element.as_str();

@@ -1,4 +1,4 @@
-const L == "idk \n";
+const L == "idk";
 
 loop i -> (0, 1) {
   whatever;
@@ -8,4 +8,4 @@ loop i -> (0, 1) {
 if condition {
   do sumn
 }
-"somethingbbbbb
+"somethingbbbbb  // error at last line + 1
