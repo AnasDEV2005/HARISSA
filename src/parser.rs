@@ -35,6 +35,10 @@ impl Parser {
                 value: Expression::Boolean(b),
             },
             Token::Operator(o) => self.parse_operator(o, self.position),
+            Token::InvalidToken(invalid) => {
+                println!("INVALID TOKEN: {}", invalid);
+                Statement::Expression(Expression::String(invalid))
+                }, // need to return an error here later
         }
     }
 

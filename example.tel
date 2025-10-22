@@ -1,6 +1,4 @@
-// comment
-
-const L == "idk";
+const L == "idk \n";
 
 loop i -> (0, 1) {
   whatever;
@@ -10,3 +8,4 @@ loop i -> (0, 1) {
 if condition {
   do sumn
 }
+"somethingbbbbb

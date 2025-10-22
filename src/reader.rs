@@ -1,7 +1,7 @@
 // use std::env;
 use std::fs;
 
-// NOTE add something that checks the file extension etc..
+// NOTE: add something that checks the file extension etc..
 
 pub fn read_file(file_path: &str) -> String {
     let contents = fs::read_to_string(file_path).expect("Error reading tel file");
@@ -84,21 +84,38 @@ pub fn parse_contents(contents: String) -> Vec<String> {
                     }
                 },
 
-                ' ' | '\n' => 
-
-                {if char == '\n' {if ignore_until_n { ignore_until_n = false};};
-                    if !ignore_until_n {
-                        if inside_single_string || inside_double_string {
-
-                            word.push(char); 
-                        } else {
-                            if !word.is_empty() {
-                                parsed_contents.push(word.clone());
-                                word.clear();
-                            }
+                ' ' | '\n' => {
+                    // handle newlines inside strings
+                    if (inside_single_string || inside_double_string) && char == '\n' {
+                        // push current partial string first, so it’s not lost
+                        if !word.is_empty() {
+                            parsed_contents.push(word.clone());
+                            word.clear();
                         }
-                    }   
-                },
+
+                        // now push newline as explicit token
+                        parsed_contents.push("\n".to_string());
+                        continue;
+                    }
+
+                    // handle end of single-line comment
+                    if char == '\n' && ignore_until_n {
+                        ignore_until_n = false;
+                        continue;
+                    }
+
+                    // outside strings/comments
+                    if !ignore_until_n {
+                        if !word.is_empty() {
+                            parsed_contents.push(word.clone());
+                            word.clear();
+                        }
+
+                        if char == '\n' {
+                            parsed_contents.push("\n".to_string());
+                        }
+                    }
+                }
 
                 _ => if !ignore_until_n {
                     word.push(char);

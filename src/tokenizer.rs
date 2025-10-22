@@ -7,68 +7,91 @@ pub enum Token {
     Boolean(bool),
     Operator(String),
     Symbol(char),
+    InvalidToken(String)
 }
 
 
-pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
 
+pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
     let mut tokens = Vec::new();
-    
-    let mut previous = String::new();
-    // to remind me to check previous token to determine if its an Identifier
+    let mut inside_string = false;
+    let mut current_string = String::new();
+    let mut quote_char = '\0';
+    let mut i = 0;
 
     for element in raw.iter() {
-        
-        if previous == "'" || previous == "\"" {
-            tokens.push(Token::String(element.to_string()));
-            previous = element.to_string();
-        } else {
-            match element.as_str() {
+        let s = element.as_str();
 
-                number if number.chars().all(|number| number.is_ascii_digit()) => { 
-                    tokens.push(Token::Number(element.to_string()));
-                    previous = element.to_string();
-            },
-
-                "const" | "while" | "for" | "where" | "if" | "else" | "elif" | "fn" | "pub" | "loop" => {
-                    tokens.push(Token::Keyword(element.to_string()));
-                    previous = element.to_string();
-                },
-
-                "=" | "+" | "-" | "/" | "*" | "%" | "|" | "&" | ">" | "<" => {
-                    let c: char = element.chars().next().unwrap();
-                    tokens.push(Token::Operator(c.to_string()));
-                    previous = element.to_string();
-                },
-
-                "\"" | "'" | ":" | "?" | "[" | "]" | "{" | "}" | "(" | ")" | "#" | "," | "." | "!" | ";" | "\\" | "\n" => {
-                    let c: char = element.chars().next().unwrap();
-                    tokens.push(Token::Symbol(c));
-                    previous = element.to_string();
-                }
-
-                "true" | "false" => {
-                    let value = element == "true";
-                    tokens.push(Token::Boolean(value));
-                },
-
-                string if (string.starts_with('"') && string.ends_with('"')) || (string.starts_with('\'') && string.ends_with('\'')) => {
-                    let content = &string[1..string.len() - 1];
-                    tokens.push(Token::String(content.to_string()));
-                    previous = element.to_string();
-                },
-
-
-
-                _ => {
-                    tokens.push(Token::Identifier(element.to_string()));
-                    previous = element.to_string();
-                }
+        print!("{}", s);
+        // if we’re inside a string, accumulate until closing quote
+        if inside_string {
+            println!("{}", current_string);
+            if element == "\n" || element == "\0" {
+                println!("DEBBUG");
+                tokens.push(Token::InvalidToken(current_string.clone()));
+                break;
+            }
+            if s == quote_char.to_string() {
+                // closing quote
+                tokens.push(Token::String(current_string.clone()));
+                current_string.clear();
+                inside_string = false;
+                continue;
+            } else {
+                // still inside string
+                println!("{}", current_string);
+                current_string.push_str(s);
+                continue;
             }
         }
+
+        // opening a string
+        if s == "\"" || s == "'" {
+            inside_string = true;
+            quote_char = s.chars().next().unwrap();
+            current_string.clear();
+            continue;
+        }
+
+        // normal tokenization
+        match s {
+            "const" | "while" | "for" | "loop" | "if" | "else" | "fn" | "pub" |
+            "string" | "int" | "object" | "list" | "enum" => tokens.push(Token::Keyword(s.to_string())),
+
+            "=" | "+" | "-" | "/" | "*" | "%" | "|" | "&" | ">" | "<" => tokens.push(Token::Operator(s.to_string())),
+
+            ":" | "?" | "[" | "]" | "{" | "}" | "(" | ")" | "#" | "," | "." | "!" | ";" | "\\" | "\n" => {
+                let c = s.chars().next().unwrap();
+                tokens.push(Token::Symbol(c));
+            }
+
+            n if n.chars().all(|c| c.is_ascii_digit()) => tokens.push(Token::Number(n.to_string())),
+
+            "true" | "false" => tokens.push(Token::Boolean(s == "true")),
+
+            _ => tokens.push(Token::Identifier(s.to_string())),
+        }
+        i+=1;
     }
+    remove_quotes(&mut tokens);
     tokens
 } 
 
+fn remove_quotes(tokens: &mut Vec<Token>) {
 
+    let mut i = 0;
+    while i < tokens.len() {
+        match tokens[i] {
+            Token::Symbol('"') | Token::Symbol('\'') => {
+                tokens.remove(i);
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+}
+
+fn collect_invalid_token() {
+
+}
 
