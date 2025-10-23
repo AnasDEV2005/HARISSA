@@ -19,29 +19,6 @@ TELL stands for “Textually Explicit and Lightweight Language.” It’s a comp
 
 ---
 
-## 2. Lexical Structure
-
-### 2.1 Tokens
-- **Identifiers:**  
-  Pattern: `[a-zA-Z_][a-zA-Z0-9_]*`
-- **Numbers:**  
-  Pattern: `[0-9]+(\.[0-9]+)?`
-- **Strings:**  
-  Pattern: `"[^"]*"`
-- **Booleans:**  
-  Keywords: `true`, `false`
-- **Symbols:**  
-  List: `() { } , ;`
-- **Operators:**  
-  List: `+ - * / = == != > < >= <= && || !`
-- **Keywords:**  
-  List: `if`, `else`, `while`, `fn`, `const`, `return`, `for ... in`
-
-### 2.2 Comments
-- **Single-line:** `// comment`
-- **Multi-line:** `/* comment */`
-
----
 
 ## 3. Syntax (Grammar)
 ```rs
@@ -151,3 +128,15 @@ good day
 Honestly the tokenizer and parser are cooked and i'll definetly refactor them later but for now i want to get this somewhat up and running so i can implement all my ideas into the interpreter (before i forget them :sob: )
 
 idk how to deal with github...
+- 23 october | a new day, a new uni day... is NOT a good day.. well except i made big progress this time <br>
+Started and finished the lexer. Going about it some other way, based on seeing someone else's lexer lol.
+So i iterate over the string once <br>
+basically: <br>
+advance in string -> find something i want -> advance in string but inside another loop -> return result of previous loop -> continue from when i stopped in the loop
+<br>
+so i dont go over anything more than once
+since i use match
+when im moving to the next character to check for syntax errors i already know what the previous character was based on what i matched with
+this might not make any sense without context
+but its good i got to write it
+cuz ill put it in the readme
