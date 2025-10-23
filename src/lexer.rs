@@ -61,6 +61,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
         }
     }
 
+    let mut debug = false;
     let mut linecount = 0;
     let mut tokens = Vec::new();
     let mut chars = contents.chars();
@@ -150,9 +151,12 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             },
                             Some('>') => {
+                                tokens.push(Token::Keyword("->".to_string()));
                                 // add the "->" token as a keyword possibly
                             },
-                            _ => {},
+                            _ => {
+                                tokens.push(Token::Operator('-'));
+                            },
                         }
                     }
 
@@ -167,8 +171,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                 // tokens.push(Token::Operator(character));
             }
 
-// TODO: IF NUMBER WHILE keyword_or_ident EMPTY AND NEXT CHARACT IS NOT A NUMBER THEN BREAK AND
-// SEND INVALID TOKEN 
+ 
 
             '/' => {
                 if !keyword_or_ident.is_empty() {
@@ -226,15 +229,50 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                         tokens.push(Token::String(string_literal));
                         break;
                     }
-                    string_literal.push(ch.expect("This should never happen."));
+                    string_literal.push(ch.expect("Failed string UNWRAP at `\"` and `'` arm "));
                 }
             }
 
+// TODO: IF NUMBER WHILE keyword_or_ident EMPTY AND NEXT CHARACT IS NOT A NUMBER THEN BREAK AND
+// SEND INVALID TOKEN
+
             ch => {
+
                 if keyword_or_ident.is_empty() {
-                    // check if c is not a number, else return invalid token
-                }
+                    // check if ch is not a number, else return invalid token
+                    if ch.is_digit(10) {
+                        let mut number: String = ch.to_string() ;
+                        loop {
+                            let next = next_char!(chars);
+                            if next == Some(' ') {
+                                tokens.push(Token::Number(number.to_string()));
+                                break;
+                            }
+                            if next == None || next == Some('\n') {
+                                tokens.push(Token::InvalidToken(character.to_string()));
+                                break;
+                            } 
+                            if next == Some(';') || next == Some(')') || next == Some(']') || next == Some(',') {
+                                tokens.push(Token::Number(number.to_string()));
+                                match next {
+                                    Some(';') => tokens.push(Token::Semicolon()),
+                                    Some(')') => tokens.push(Token::CloseParenth()),
+                                    Some(']') => tokens.push(Token::CloseSquareBracket()),
+                                    Some(',') => tokens.push(Token::Comma()),
+                                    _ => println!("CASE ALREADY COVERED"),
+                                }
+                                break;
+                            }
+                            if !next.expect("Unwrapping ERROR lexer.rs at _ arm").is_digit(10) {
+                                tokens.push(Token::InvalidToken(character.to_string()));
+                                break;
+                            }
+                            number.push(next.expect("Unwrapping ERROR lexer.rs at _ arm"));
+                        }
+                    }
+                } else {
                 keyword_or_ident.push(ch);
+                }
             }
         }
     }
@@ -246,7 +284,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
 fn unwrap_word(word: &String) -> Token {
     match word.as_str() {
-        "const" | "while" | "for" | "loop" | "if" | "else" | "fn" | "pub" | "string" | "int" | "object" | "list" 
+        "const" | "while" | "for" | "loop" | "if" | "else" | "fn" | "pub" | "string" | "int" | "uint" | "object" | "list" 
             | "variant" | "tuple" => Token::Keyword(word.to_string()), // i might make a token for every keyword idk
         _ => Token::Identifier(word.to_string()),
     }

@@ -4,14 +4,16 @@ loop i -> (0, 1) {
   whatever;
 }
 
-// fegmkrdmgmre
+int number = 2005 ;
+
+// comment line
 
 /*
-COMMENT
+COMMENT block
 */
 
 
 if condition {
   do sumn
 }
-"somethingbbbbb  // error at last line + 1
+"invalidtoken
