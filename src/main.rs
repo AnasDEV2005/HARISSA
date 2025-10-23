@@ -1,16 +1,14 @@
 use lexer::tokenize;
 
-mod reader;
 mod util;
 mod syntaxtree;
-mod tokenizer;
 mod interpreter;
 mod parser;
 mod lexer;
 
 
 fn main() {
-    let contents = reader::read_file("./example.tel");
+    let contents = lexer::read_file("./example.tel");
     
     let tokens = tokenize(contents);
     // let parsed_contents = reader::parse_contents(contents);

@@ -1,6 +1,6 @@
 
 use crate::syntaxtree::{Statement, Expression, LoopRange};
-use crate::tokenizer::Token;
+use crate::lexer::Token;
 
 #[derive(Debug)]
 pub struct Parser {
