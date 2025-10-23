@@ -93,7 +93,6 @@ pub fn tokenize(raw: Vec<String>) -> Vec<Token> {
 
             _ => tokens.push(Token::Identifier(s.to_string())),
         }
-        i+=1;
     }
     remove_quotes(&mut tokens);
     tokens
