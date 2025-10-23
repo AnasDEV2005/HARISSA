@@ -133,9 +133,6 @@ Started and finished the lexer. Going about it some other way, based on seeing s
 So i iterate over the string once <br>
 basically: <br>
 advance in string -> find something i want -> advance in string but inside another loop -> return result of previous loop -> continue from when i stopped in the loop<br>
-so i dont go over anything more than once
-since i use match
+so i dont go over anything more than once<br>
+since i use match<br>
 when im moving to the next character to check for syntax errors i already know what the previous character was based on what i matched with
-this might not make any sense without context
-but its good i got to write it
-cuz ill put it in the readme
