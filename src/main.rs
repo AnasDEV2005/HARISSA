@@ -10,18 +10,18 @@ mod lexer;
 
 
 fn main() {
-    println!("\n\nTesting File Reading");
     let contents = reader::read_file("./example.tel");
     
     let tokens = tokenize(contents);
     // let parsed_contents = reader::parse_contents(contents);
 
-    println!("{:?}", tokens);
+   // println!("{:?}", tokens);
 
     // let tokens = tokenizer::tokenize(parsed_contents);
 
     // test
-    for token in &tokens { println!("{:?}", token); }
+    for token in &tokens { 
+        println!("{:?}", token); }
     
     /*
     let mut parser = parser::Parser {
@@ -32,4 +32,3 @@ fn main() {
    // let parsed = parser.parse();
     // println!("{:?}", parsed);
 }
-

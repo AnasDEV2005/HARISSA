@@ -1,19 +1,24 @@
-const L == "idk";
+
+const identifier == "string";
+
 
 loop i -> (0, 1) {
-  whatever;
+  identifier;
 }
 
+
 int number = 2005 ;
+
+int total = number+20/100*2**100-number%2;
 
 // comment line
 
 /*
 COMMENT block
+
 */
 
 
-if condition {
-  do sumn
+if identifier || true {
+  return;
 }
-"invalidtoken

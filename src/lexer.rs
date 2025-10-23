@@ -33,7 +33,6 @@ pub enum Token {
     Number(String),
     String(String),
     Boolean(bool),
-    Operator(char),
     Comma(),
     Semicolon(),
     OpenParenth(),
@@ -42,9 +41,23 @@ pub enum Token {
     CloseCurlyBracket(),
     OpenSquareBracket(),
     CloseSquareBracket(),
-    EndOfLine(),
+    EndOfFile(i32),
+    AssignIncrement(),
+    AssignDecrement(),
+    PowerOperator(),
+    PlusOperator(),
+    MinusOperator(),
+    MultiplicationOperator(),
+    DivisionOperator(),
+    ModuloOperator(),
+    AssignBool(),
+    AssignEqual(),
+    OrBool(),
+    DblOrBool(),
+    AndBool(),
+    DblAndBool(),
     Symbol(char),
-    InvalidToken(String)
+    InvalidToken((String, i32))
 }
 
 
@@ -62,7 +75,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
     }
 
     let mut debug = false;
-    let mut linecount = 0;
+    let mut linecount: i32 = 1;
     let mut tokens = Vec::new();
     let mut chars = contents.chars();
     let mut keyword_or_ident = String::new();
@@ -71,7 +84,10 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
         let c = next_char!(chars);
 
-        if c == None { break; } // END OF FILE 
+        if c == None { tokens.push(Token::EndOfFile(linecount-2)); break; } // END OF FILE 
+                                                                            // HACK: idk why it
+                                                                            // counts 2 extra lines
+                                                                            // but we ball
 
         let character = c.unwrap();
          
@@ -88,10 +104,71 @@ pub fn tokenize(contents: String) -> Vec<Token> {
             '\n' => {
                 linecount += 1;
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(Token::InvalidToken(keyword_or_ident));
+                    tokens.push(Token::InvalidToken((keyword_or_ident, linecount)));
                     break;
                 }
-                tokens.push(Token::EndOfLine());
+            }
+
+            '!' | '?' | '\\' | '$' | '#' | '@' => {
+                tokens.push(Token::Symbol(character));
+            }
+
+            '|' | '&' | '=' => {
+                match character {
+                    '|' => {
+                        
+                        let next = next_char!(chars);
+                        match next {
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                                break;
+                            }
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
+                                    tokens.push(Token::OrBool());
+                            },
+                            Some('|') => {tokens.push(Token::DblOrBool());},
+                            _ => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                            },
+                        }
+                    },
+                    '&' => {
+                        
+                        let next = next_char!(chars);
+                        match next {
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                                break;
+                            }
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
+                                    tokens.push(Token::AndBool());
+                            },
+                            Some('&') => {tokens.push(Token::DblAndBool());},
+                            _ => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                            },
+                        }
+                    }
+                    '=' => {
+                        
+                        let next = next_char!(chars);
+                        match next {
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                                break;
+                            }
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
+                                    tokens.push(Token::AssignEqual());
+                            },
+                            Some('=') => {tokens.push(Token::AssignBool());},
+                            _ => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                            },
+                        }
+                    }
+                    _ => {}
+                }
+
             }
 
             ';' => {
@@ -144,18 +221,22 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                 match character {
                     '-' => {
                         
-                        let next = next_char!(chars);
+                        let next = chars.clone().next();
                         match next {
-                            None | Some('\n')  | Some('-') | Some('+') | Some('*') | Some('%') | Some('=') => {
-                                tokens.push(Token::InvalidToken(character.to_string()));
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                                 break;
+                            }
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
+                                    tokens.push(Token::MinusOperator());
                             },
+                            Some('=') => {tokens.push(Token::AssignDecrement());},
                             Some('>') => {
                                 tokens.push(Token::Keyword("->".to_string()));
-                                // add the "->" token as a keyword possibly
+                                // add the `->` token as a keyword since its equivalent to `in` 
                             },
                             _ => {
-                                tokens.push(Token::Operator('-'));
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             },
                         }
                     }
@@ -163,12 +244,69 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
 
                     // TODO: deal with next token being invalid
-                    '+' => {},
-                    '*' => {},
-                    '%' => {},
+
+                    '+' => {
+
+                        /* 
+                         // NOTE: I clone here in order to look ahead without consuming the next character 
+                            otherwise i would end up consuming the first character of the next token 
+                            and it will dissapear into the void
+                        */
+
+                        let next = chars.clone().next();
+                        match next {
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                                break;
+                            }
+                            Some('=') => {tokens.push(Token::AssignIncrement());},
+
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
+                                    tokens.push(Token::PlusOperator());
+                            },
+
+                            _ => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                            },
+                        }
+
+                    },
+                    '*' => {
+                        let mut next = chars.clone().next();
+                        match next {
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                                break;
+                            }
+                            Some('*') => {
+                                tokens.push(Token::PowerOperator());
+                                next = next_char!(chars);
+                            },
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some()  => {
+                                    tokens.push(Token::MultiplicationOperator());
+                            },
+                            _ => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                            },
+                        }
+                    },
+                    '%' => {
+                        let next = chars.clone().next();
+                        match next {
+                            None => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                                break;
+                            }
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some()  => {
+                                    tokens.push(Token::ModuloOperator());
+                            },
+                            _ => {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
+                            },
+                        }
+                    },
                     _ => {}, // i dont get why this is non exaustive but oke
                 }
-                // tokens.push(Token::Operator(character));
             }
 
  
@@ -178,32 +316,39 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                     tokens.push(unwrap_word(&keyword_or_ident));
                     keyword_or_ident.clear();
                 }
-                let mut next = next_char!(chars);
+                let mut next = chars.clone().next();
                 match next {
                     None | Some('\n') => {
-                        tokens.push(Token::InvalidToken(character.to_string()));
+                        tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                         break;
                     },
                     Some('/') => {
                         while next != Some('\n') {
                             next = next_char!(chars);
                         }
-                        tokens.push(Token::EndOfLine());
+                        linecount += 1;
                     }, // comment line ignore
                        
                     Some('*') => {
+                        next = next_char!(chars);
+                        next = next_char!(chars);
                         while next != Some('*') {
-                            if next == Some('\n') {tokens.push(Token::EndOfLine()); }
+                            if next == Some('\n') { linecount += 1;}
                             next = next_char!(chars);
                         }
+
                         next = next_char!(chars);
-                        if next != Some('/') {
-                            tokens.push(Token::InvalidToken(character.to_string()));
+
+                        if next == Some('/') { linecount += 1;}
+
+                        else {
+                            println!("DEBUG: {}", next.expect("oh come on vro").to_string());
+                            tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             break;
                         }
-                    },           // comment block ignore
+                    },  // comment block ignore
 
-                    _ => tokens.push(Token::Operator(character)),
+                    _ => tokens.push(Token::DivisionOperator()),
 
                 }
 
@@ -221,7 +366,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                 loop {
                     let ch = next_char!(chars);
                     if ch == None || ch == Some('\n') {
-                        tokens.push(Token::InvalidToken(character.to_string()));
+                        tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                         break;
                     }
 
@@ -243,17 +388,25 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                     if ch.is_digit(10) {
                         let mut number: String = ch.to_string() ;
                         loop {
-                            let next = next_char!(chars);
-                            if next == Some(' ') {
+                            let next_image = chars.clone().next();
+                            if next_image == Some(' ') {
                                 tokens.push(Token::Number(number.to_string()));
                                 break;
                             }
-                            if next == None || next == Some('\n') {
-                                tokens.push(Token::InvalidToken(character.to_string()));
+                            if next_image == Some('+') || next_image == Some('-') || next_image == Some('/') 
+                                || next_image == Some('*') || next_image == Some('%') 
+                            { // (forgive me just this once)
+                                tokens.push(Token::Number(number.to_string()));
+                                break;
+                            }
+                            
+                            if next_image == None || next_image == Some('\n') {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                                 break;
                             } 
-                            if next == Some(';') || next == Some(')') || next == Some(']') || next == Some(',') {
+                            if next_image == Some(';') || next_image == Some(')') || next_image == Some(']') || next_image == Some(',') {
                                 tokens.push(Token::Number(number.to_string()));
+                                let next = next_char!(chars);
                                 match next {
                                     Some(';') => tokens.push(Token::Semicolon()),
                                     Some(')') => tokens.push(Token::CloseParenth()),
@@ -263,15 +416,18 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 }
                                 break;
                             }
-                            if !next.expect("Unwrapping ERROR lexer.rs at _ arm").is_digit(10) {
-                                tokens.push(Token::InvalidToken(character.to_string()));
+                            if !next_image.expect("Unwrapping ERROR lexer.rs at _ arm").is_digit(10) {
+                                tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                                 break;
                             }
+                            let next = next_char!(chars);
                             number.push(next.expect("Unwrapping ERROR lexer.rs at _ arm"));
                         }
-                    }
+                    } else {
+                        keyword_or_ident.push(ch);
+                    } 
                 } else {
-                keyword_or_ident.push(ch);
+                    keyword_or_ident.push(ch);
                 }
             }
         }
@@ -285,7 +441,9 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 fn unwrap_word(word: &String) -> Token {
     match word.as_str() {
         "const" | "while" | "for" | "loop" | "if" | "else" | "fn" | "pub" | "string" | "int" | "uint" | "object" | "list" 
-            | "variant" | "tuple" => Token::Keyword(word.to_string()), // i might make a token for every keyword idk
+            | "variant" | "tuple" | "ERROR_RULES" => Token::Keyword(word.to_string()), // i might make a token for every keyword idk
+        "true" => Token::Boolean(true),
+        "false" => Token::Boolean(false),
         _ => Token::Identifier(word.to_string()),
     }
 }
