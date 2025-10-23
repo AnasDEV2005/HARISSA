@@ -132,8 +132,7 @@ idk how to deal with github...
 Started and finished the lexer. Going about it some other way, based on seeing someone else's lexer lol.
 So i iterate over the string once <br>
 basically: <br>
-advance in string -> find something i want -> advance in string but inside another loop -> return result of previous loop -> continue from when i stopped in the loop
-<br>
+advance in string -> find something i want -> advance in string but inside another loop -> return result of previous loop -> continue from when i stopped in the loop<br>
 so i dont go over anything more than once
 since i use match
 when im moving to the next character to check for syntax errors i already know what the previous character was based on what i matched with
