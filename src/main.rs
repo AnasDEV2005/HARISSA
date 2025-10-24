@@ -21,12 +21,10 @@ fn main() {
     for token in &tokens { 
         println!("{:?}", token); }
     
-    /*
     let mut parser = parser::Parser {
-        tokens: tokens,
+        tokens,
         position: 0
     };
-*/
-   // let parsed = parser.parse();
-    // println!("{:?}", parsed);
+    let parsed = parser.parse();
+    println!("{:?}", parsed);
 }

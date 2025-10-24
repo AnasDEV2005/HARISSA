@@ -10,6 +10,7 @@ pub struct Parser {
 
 
 
+
 impl Parser {
     pub fn parse(&mut self) -> Vec<Statement> {
         let mut statements = Vec::new();
@@ -28,17 +29,47 @@ impl Parser {
             Token::String(s) => Statement::Expression(Expression::String(s)),
             Token::Keyword(k) => self.parse_keyword(k, self.position),
             Token::Symbol(chr) => self.parse_symbol(chr, self.position),
-            Token::Identifier(i) => self.parse_identifier(i, self.position),
+            Token::Identifier(ident) => self.parse_identifier(ident, self.position),
             Token::Boolean(b) => Statement::ConstDeclaration {
                 name: "x".to_string(),
                 datatype: "int".to_string(),
                 value: Expression::Boolean(b),
             },
-            Token::Operator(o) => self.parse_operator(o, self.position),
-            Token::InvalidToken(invalid) => {
-                println!("INVALID TOKEN: {}", invalid);
-                Statement::Expression(Expression::String(invalid))
-                }, // need to return an error here later
+            // Token::Comma() => ,
+            // Token::Semicolon() => ,
+            // Token::OpenParenth() => ,
+            // Token::CloseParenth() => ,
+            // Token::OpenCurlyBracket() => ,
+            // Token::CloseCurlyBracket() => ,
+            // Token::OpenSquareBracket() => ,
+            // Token::CloseSquareBracket() => ,
+            // Token::EndOfFile(i32) => ,
+            // Token::AssignIncrement() => ,
+            // Token::AssignDecrement() => ,
+            // Token::PowerOperator() => ,
+            // Token::PlusOperator() => ,
+            // Token::MinusOperator() => ,
+            // Token::MultiplicationOperator() => ,
+            // Token::DivisionOperator() => ,
+            // Token::ModuloOperator() => ,
+            // Token::AssignBool() => ,
+            // Token::AssignEqual() => ,
+            // Token::OrBool() => ,
+            // Token::DblOrBool() => ,
+            // Token::AndBool() => ,
+            // Token::DblAndBool() => ,
+            // Token::Symbol(char) => ,
+
+            Token::InvalidToken((msg, line)) => {
+                println!("Line {line} | INVALID TOKEN: {}", msg);
+                Statement::SyntaxError {
+                    message: msg,
+                    line, // equivalent to line: line,
+                }
+            },
+            _ => {
+                Statement::PlaceHolder {  }
+            },
         }
     }
 
@@ -60,8 +91,12 @@ impl Parser {
             // iterator: checks if there is an identifier after impl Trait for Type 
             // range: either, length of the variable after the iterator, or the range specified
             
+
             "loop" => {println!("{:?}", self.parse_loop()); return self.parse_loop()},
 
+
+            // placeholders
+            
             "while" => Statement::While {
                 condition: Expression::Identifier("cond".into()),
                 body: Box::new(Statement::Expression(Expression::Identifier("body".into()))),
@@ -79,6 +114,7 @@ impl Parser {
                 value: Expression::Number("0".into()),
             },
 
+
             "elif" => Statement::Expression(Expression::Identifier("elif".into())),
 
             "string" => Statement::Expression(Expression::Identifier("string".into())),
@@ -91,7 +127,7 @@ impl Parser {
 
             "object" => Statement::Expression(Expression::Identifier("object".into())),
 
-            "enum" => Statement::Expression(Expression::Identifier("object".into())),
+            "variant" => Statement::Expression(Expression::Identifier("variant".into())),
 
             _ => Statement::Expression(Expression::Identifier("unknown".into())),
         }
@@ -134,14 +170,6 @@ impl Parser {
         self.position += 1;
         while self.position < self.tokens.len() {
 
-            //HACK: i dont quite understand this uh syntax but i know the whole point is to check
-            //if the token is a symbol and run a condition on the aforementioned symbol
-
-            if let Token::Symbol(c) = &self.tokens[self.position] {
-                if *c == '{' {
-                    break; // stop before block start
-                }
-            }
             expr_tokens.push(self.tokens[self.position].clone());
             self.position += 1;
         }
@@ -183,7 +211,7 @@ impl Parser {
         }
         statements
     }
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 
 
 
@@ -192,37 +220,39 @@ impl Parser {
 
 //--------------------------------------------------------------------------------
     // LOOP
+    // FIXME: something here returns no range !!
     fn parse_loop(&mut self) -> Statement {
         self.position += 1;
 
-        println!("parsing loop");
         let mut iterator = None;
         let mut range = None;
 
-        // check if next token is an identifier → "loop i -> count"
+        // this checks if the next token is an ident (like i for iterator)
+        // if so it collects the range
         if let Some(Token::Identifier(name)) = self.tokens.get(self.position) {
             iterator = Some(name.clone());
             self.position += 1;
 
-            let dash = "-".to_string();
-            let greath = ">".to_string();
-
             // check for ->
-            if let Some(Token::Operator(dash)) = self.tokens.get(self.position) {
-                self.position += 1; // skip '-'
-                if let Some(Token::Operator(greath)) = self.tokens.get(self.position) {
-                    range = Some(self.collect_range());
-                    println!("{:?}", range);
-                }
+            let token = &self.tokens[self.position]; 
+            match  token {
+                Token::Keyword(k) if *k == "->".to_string() => {
+                    range = Some(self.collect_range()); 
+                    // self.collect_range collects range whether its (x, y) or just x
+                    // println!("{:?}", range);
+                },
+                Token::OpenCurlyBracket() => {
+                    eprintln!("Syntax error for parse_loop, no range after ->"); 
+                },
+                _ => eprintln!("Error in function: parse_loop"),
             }
         }
 
         // now collect the body normally
         let block = self.collect_block();
         Statement::Loop {
-            iterator: iterator,
-
-            range: range,
+            iterator,
+            range,
             body: Box::new(Statement::Block(self.parse_block(block))),
         }
     }

@@ -53,7 +53,7 @@ object Person {
 ## Error Handling
 
 ```rs
-$ERRORS { 
+ERROR_RULES { 
     file_read: "Error reading file",
     data_not_found(string): "Error data not found at {0}",
 }

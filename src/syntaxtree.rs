@@ -42,6 +42,10 @@ pub enum LoopRange {
 #[derive(Debug)]
 pub enum Statement {
 
+    PlaceHolder {},
+
+    ErrorRules {},
+
     ConstDeclaration {
         name: String,
         datatype: String,
@@ -82,6 +86,11 @@ pub enum Statement {
         params: Vec<String>,
         body: Box<Statement>, // usually a Block
     },
+
+    SyntaxError {
+        message: String,
+        line: i32,
+    }
 }
 
 
