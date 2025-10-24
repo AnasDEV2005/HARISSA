@@ -215,7 +215,6 @@ impl Parser {
 
 
 
-
 //--------------------------------------------------------------------------------
     // LOOP
     // HACK: this function was borrow checker hell... i hope not to have to touch it again
@@ -255,15 +254,16 @@ impl Parser {
         let block = self.collect_block();
 
         match iterator {
-            Some((i, _)) => {
+            Some((i, l)) => {
                 match range {
                     Some(LoopRange::InvalidRange(_)) => {
                         return Statement::SyntaxError {
                             message: "Invalid loop range".to_string(),
-                            line: 0,  // FIXME: Find a way to report the line number of this thing
+                            line: l,  // FIXME: Find a way to report the line number of this thing
                         }
                     }
                     _ => {
+                        println!("{l}");
                         return Statement::Loop {
                             iterator: Some(i),
                             range,
