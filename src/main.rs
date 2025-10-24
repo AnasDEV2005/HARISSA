@@ -5,6 +5,7 @@ mod syntaxtree;
 mod interpreter;
 mod parser;
 mod lexer;
+mod parser_v2;
 
 
 fn main() {
