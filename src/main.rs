@@ -5,7 +5,6 @@ mod syntaxtree;
 mod interpreter;
 mod parser;
 mod lexer;
-mod parser_v2;
 
 
 fn main() {
@@ -22,10 +21,6 @@ fn main() {
     // for token in &tokens { 
     //     println!("{:?}", token); }
     
-    let mut parser = parser::Parser {
-        tokens,
-        position: 0
-    };
-    let parsed = parser.parse();
+    let parsed = parser::parse(tokens);
     println!("{:?}", parsed);
 }
