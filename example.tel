@@ -2,7 +2,7 @@
 const identifier == "string";
 
 
-loop i -> (0, 1) {
+loop i -> (0, 10) {
   identifier;
 }
 

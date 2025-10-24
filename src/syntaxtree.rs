@@ -32,10 +32,11 @@ pub enum Expression {
 
 #[derive(Debug)]
 pub enum LoopRange {
-    Number(i64),
-    Range((i64, i64)),
+    Number(i32),
+    Range((i32, i32)),
     Identifier(String),
     List(Vec<Expression>),
+    InvalidRange(i32),
 }
 
 

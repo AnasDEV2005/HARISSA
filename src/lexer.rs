@@ -26,37 +26,38 @@ pub fn read_file(file_path: &str) -> String {
 }
 
 
+// NOTE: i32 is for line count to be returned for further erroring in the parser
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    Keyword(String),
-    Identifier(String),
-    Number(String),
-    String(String),
-    Boolean(bool),
-    Comma(),
-    Semicolon(),
-    OpenParenth(),
-    CloseParenth(),
-    OpenCurlyBracket(),
-    CloseCurlyBracket(),
-    OpenSquareBracket(),
-    CloseSquareBracket(),
+    Keyword((String, i32)),
+    Identifier((String, i32)),
+    Number((String, i32)),
+    String((String, i32)),
+    Boolean((bool, i32)),
+    Comma(i32),
+    Semicolon(i32),
+    OpenParenth(i32),
+    CloseParenth(i32),
+    OpenCurlyBracket(i32),
+    CloseCurlyBracket(i32),
+    OpenSquareBracket(i32),
+    CloseSquareBracket(i32),
     EndOfFile(i32),
-    AssignIncrement(),
-    AssignDecrement(),
-    PowerOperator(),
-    PlusOperator(),
-    MinusOperator(),
-    MultiplicationOperator(),
-    DivisionOperator(),
-    ModuloOperator(),
-    AssignBool(),
-    AssignEqual(),
-    OrBool(),
-    DblOrBool(),
-    AndBool(),
-    DblAndBool(),
-    Symbol(char),
+    AssignIncrement(i32),
+    AssignDecrement(i32),
+    PowerOperator(i32),
+    PlusOperator(i32),
+    MinusOperator(i32),
+    MultiplicationOperator(i32),
+    DivisionOperator(i32),
+    ModuloOperator(i32),
+    AssignBool(i32),
+    AssignEqual(i32),
+    OrBool(i32),
+    DblOrBool(i32),
+    AndBool(i32),
+    DblAndBool(i32),
+    Symbol(char, i32),
     InvalidToken((String, i32))
 }
 
@@ -74,7 +75,6 @@ pub fn tokenize(contents: String) -> Vec<Token> {
         }
     }
 
-    let mut debug = false;
     let mut linecount: i32 = 1;
     let mut tokens = Vec::new();
     let mut chars = contents.chars();
@@ -96,7 +96,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
             ' ' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
             }
@@ -110,7 +110,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
             }
 
             '!' | '?' | '\\' | '$' | '#' | '@' => {
-                tokens.push(Token::Symbol(character));
+                tokens.push(Token::Symbol(character, linecount));
             }
 
             '|' | '&' | '=' => {
@@ -124,9 +124,9 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             }
                             next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
-                                    tokens.push(Token::OrBool());
+                                    tokens.push(Token::OrBool(linecount));
                             },
-                            Some('|') => {tokens.push(Token::DblOrBool());},
+                            Some('|') => {tokens.push(Token::DblOrBool(linecount));},
                             _ => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             },
@@ -141,9 +141,9 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             }
                             next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
-                                    tokens.push(Token::AndBool());
+                                    tokens.push(Token::AndBool(linecount));
                             },
-                            Some('&') => {tokens.push(Token::DblAndBool());},
+                            Some('&') => {tokens.push(Token::DblAndBool(linecount));},
                             _ => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             },
@@ -158,9 +158,9 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             }
                             next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
-                                    tokens.push(Token::AssignEqual());
+                                    tokens.push(Token::AssignEqual(linecount));
                             },
-                            Some('=') => {tokens.push(Token::AssignBool());},
+                            Some('=') => {tokens.push(Token::AssignBool(linecount));},
                             _ => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             },
@@ -173,69 +173,72 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
             ';' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
-                tokens.push(Token::Semicolon());
+                tokens.push(Token::Semicolon(linecount));
             }
 
             ',' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
-                tokens.push(Token::Comma());
+                tokens.push(Token::Comma(linecount));
             }
 
             '{' | '}' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
-                if character == '{' {tokens.push(Token::OpenCurlyBracket());} else {tokens.push(Token::CloseCurlyBracket());}
+                if character == '{' {tokens.push(Token::OpenCurlyBracket(linecount));} else {tokens.push(Token::CloseCurlyBracket(linecount));}
             }
 
             '(' | ')' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
-                if character == '(' {tokens.push(Token::OpenParenth());} else {tokens.push(Token::CloseParenth());}
+                if character == '(' {tokens.push(Token::OpenParenth(linecount));} else {tokens.push(Token::CloseParenth(linecount));}
             }
 
             '[' | ']' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
-                if character == '[' {tokens.push(Token::OpenSquareBracket());} else {tokens.push(Token::CloseSquareBracket());}
+                if character == '[' {tokens.push(Token::OpenSquareBracket(linecount));} else {tokens.push(Token::CloseSquareBracket(linecount));}
             }
 
 
             '-' | '+' | '*' | '%' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
 
                 match character {
                     '-' => {
                         
-                        let next = chars.clone().next();
+                        let mut next = chars.clone().next();
                         match next {
                             None => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                                 break;
                             }
-                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
-                                    tokens.push(Token::MinusOperator());
-                            },
-                            Some('=') => {tokens.push(Token::AssignDecrement());},
+                            // NOTE: check for `>` first !! 
                             Some('>') => {
-                                tokens.push(Token::Keyword("->".to_string()));
+                                tokens.push(Token::Keyword(("->".to_string(), linecount)));
+                                next = next_char!(chars);
                                 // add the `->` token as a keyword since its equivalent to `in` 
                             },
-                            _ => {
+                            
+                            next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
+                                    tokens.push(Token::MinusOperator(linecount));
+                                    // println!("added minus operator")
+                            },
+                            Some('=') => {tokens.push(Token::AssignDecrement(linecount));},_ => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             },
                         }
@@ -259,10 +262,10 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                                 break;
                             }
-                            Some('=') => {tokens.push(Token::AssignIncrement());},
+                            Some('=') => {tokens.push(Token::AssignIncrement(linecount));},
 
                             next if next.expect("").is_alphanumeric() || Some(' ').is_some() => {
-                                    tokens.push(Token::PlusOperator());
+                                    tokens.push(Token::PlusOperator(linecount));
                             },
 
                             _ => {
@@ -279,11 +282,11 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             }
                             Some('*') => {
-                                tokens.push(Token::PowerOperator());
+                                tokens.push(Token::PowerOperator(linecount));
                                 next = next_char!(chars);
                             },
                             next if next.expect("").is_alphanumeric() || Some(' ').is_some()  => {
-                                    tokens.push(Token::MultiplicationOperator());
+                                    tokens.push(Token::MultiplicationOperator(linecount));
                             },
                             _ => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
@@ -298,7 +301,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             }
                             next if next.expect("").is_alphanumeric() || Some(' ').is_some()  => {
-                                    tokens.push(Token::ModuloOperator());
+                                    tokens.push(Token::ModuloOperator(linecount));
                             },
                             _ => {
                                 tokens.push(Token::InvalidToken((character.to_string(), linecount)));
@@ -313,7 +316,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
             '/' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
                 let mut next = chars.clone().next();
@@ -342,13 +345,13 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                         if next == Some('/') { linecount += 1;}
 
                         else {
-                            println!("DEBUG: {}", next.expect("oh come on vro").to_string());
+                            // println!("DEBUG: {}", next.expect("oh come on vro").to_string());
                             tokens.push(Token::InvalidToken((character.to_string(), linecount)));
                             break;
                         }
                     },  // comment block ignore
 
-                    _ => tokens.push(Token::DivisionOperator()),
+                    _ => tokens.push(Token::DivisionOperator(linecount)),
 
                 }
 
@@ -358,7 +361,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 
             '"' | '\'' => {
                 if !keyword_or_ident.is_empty() {
-                    tokens.push(unwrap_word(&keyword_or_ident));
+                    tokens.push(unwrap_word(&keyword_or_ident, linecount));
                     keyword_or_ident.clear();
                 }
 
@@ -371,7 +374,7 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                     }
 
                     if ch == Some(character) {
-                        tokens.push(Token::String(string_literal));
+                        tokens.push(Token::String((string_literal, linecount)));
                         break;
                     }
                     string_literal.push(ch.expect("Failed string UNWRAP at `\"` and `'` arm "));
@@ -390,13 +393,13 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                         loop {
                             let next_image = chars.clone().next();
                             if next_image == Some(' ') {
-                                tokens.push(Token::Number(number.to_string()));
+                                tokens.push(Token::Number((number.to_string(), linecount)));
                                 break;
                             }
                             if next_image == Some('+') || next_image == Some('-') || next_image == Some('/') 
                                 || next_image == Some('*') || next_image == Some('%') 
                             { // (forgive me just this once)
-                                tokens.push(Token::Number(number.to_string()));
+                                tokens.push(Token::Number((number.to_string(), linecount)));
                                 break;
                             }
                             
@@ -405,13 +408,13 @@ pub fn tokenize(contents: String) -> Vec<Token> {
                                 break;
                             } 
                             if next_image == Some(';') || next_image == Some(')') || next_image == Some(']') || next_image == Some(',') {
-                                tokens.push(Token::Number(number.to_string()));
+                                tokens.push(Token::Number((number.to_string(), linecount)));
                                 let next = next_char!(chars);
                                 match next {
-                                    Some(';') => tokens.push(Token::Semicolon()),
-                                    Some(')') => tokens.push(Token::CloseParenth()),
-                                    Some(']') => tokens.push(Token::CloseSquareBracket()),
-                                    Some(',') => tokens.push(Token::Comma()),
+                                    Some(';') => tokens.push(Token::Semicolon(linecount)),
+                                    Some(')') => tokens.push(Token::CloseParenth(linecount)),
+                                    Some(']') => tokens.push(Token::CloseSquareBracket(linecount)),
+                                    Some(',') => tokens.push(Token::Comma(linecount)),
                                     _ => println!("CASE ALREADY COVERED"),
                                 }
                                 break;
@@ -438,13 +441,13 @@ pub fn tokenize(contents: String) -> Vec<Token> {
 }
 
 
-fn unwrap_word(word: &String) -> Token {
+fn unwrap_word(word: &String, linecount: i32) -> Token {
     match word.as_str() {
         "const" | "while" | "for" | "loop" | "if" | "else" | "fn" | "pub" | "string" | "int" | "uint" | "object" | "list" 
-            | "variant" | "tuple" | "ERROR_RULES" => Token::Keyword(word.to_string()), // i might make a token for every keyword idk
-        "true" => Token::Boolean(true),
-        "false" => Token::Boolean(false),
-        _ => Token::Identifier(word.to_string()),
+            | "variant" | "tuple" | "ERROR_RULES" => Token::Keyword((word.to_string(), linecount)), // i might make a token for every keyword idk
+        "true" => Token::Boolean((true, linecount)),
+        "false" => Token::Boolean((false, linecount)),
+        _ => Token::Identifier((word.to_string(), linecount)),
     }
 }
 
