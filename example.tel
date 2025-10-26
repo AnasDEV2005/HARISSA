@@ -1,15 +1,20 @@
 
+while identifier || true {
+  return;
+}
+
+
 const identifier == "string";
 
 
-loop i -> (0, 10) {
+loop i -> (ident, ident) {
   identifier;
 }
 
 
 int number = 2005 ;
 
-int total = number+20/100*2**100-number%2;
+int total = number+(-20)/100*2**100-number%2;
 
 // comment line
 

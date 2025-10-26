@@ -3,18 +3,11 @@
 use std::fs;
 use std::process::Command;
 
-
-
-
-
-
-
 pub fn normalize_input(input: &str) -> String {
     // Define the set of single-character operators/symbols you care about
     let symbols: [char; 24] = [
-        ':', '=', '+', '-', '/', '*', '%', '|', '&', '?',
-        '[', ']', '{', '}', '(', ')', '#', '>', '<', ',',
-        '.', '!', ';', '\\',
+        ':', '=', '+', '-', '/', '*', '%', '|', '&', '?', '[', ']', '{', '}', '(', ')', '#', '>',
+        '<', ',', '.', '!', ';', '\\',
     ];
 
     let mut result = String::new();
@@ -32,20 +25,6 @@ pub fn normalize_input(input: &str) -> String {
 
     result
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /// Write a String to a file (overwriting if it exists)
 pub fn write_file(path: &str, content: &str) -> Result<(), std::io::Error> {
@@ -65,6 +44,3 @@ pub fn compile_rust(source_rs: &str) {
         println!("Compiled {} successfully.", source_rs);
     }
 }
-
-
-

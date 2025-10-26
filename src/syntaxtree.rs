@@ -1,17 +1,17 @@
 // src/syntaxtree.rs
 
-
-
-
-
+#[allow(warnings)]
 // expression is basically something that has a value
 #[derive(Debug)]
 pub enum Expression {
+    New(),
     Number(String),
     String(String),
     Boolean(bool),
     Identifier(String),
-    
+
+    Couple(Box<Expression>, Box<Expression>),
+
     Binary {
         left: Box<Expression>,
         operator: String,
@@ -27,23 +27,16 @@ pub enum Expression {
         callee: Box<Expression>,
         arguments: Vec<Expression>,
     },
+
+    InvalidExpression {
+        message: String,
+        line: i32,
+    },
 }
-
-
-#[derive(Debug)]
-pub enum LoopRange {
-    Number(i32),
-    Range((i32, i32)),
-    Identifier(String),
-    List(Vec<Expression>),
-    InvalidRange(i32),
-}
-
 
 #[derive(Debug)]
 pub enum Statement {
-
-    PlaceHolder {},
+    New(),
 
     ErrorRules {},
 
@@ -69,13 +62,11 @@ pub enum Statement {
         else_branch: Option<Box<Statement>>,
     },
 
-
     Loop {
-        iterator: Option<String>,       // e.g., "i" (or None for plain `loop`)
-        range: Option<LoopRange>,      // e.g., Expression::Identifier("count")
-        body: Box<Statement>,           // usually a Block
+        iterator: Option<String>, // e.g., "i" (or None for plain `loop`)
+        range: Expression,        // e.g., Expression::Identifier("count")
+        body: Box<Statement>,     // usually a Block
     },
-
 
     While {
         condition: Expression,
@@ -91,8 +82,5 @@ pub enum Statement {
     ParsingError {
         message: String,
         line: i32,
-    }
+    },
 }
-
-
-
