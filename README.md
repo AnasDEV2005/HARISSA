@@ -2,16 +2,15 @@
 # WIP
 (work in progress)
 
-# TELL Programming Language
+# HARISSA Programming Language
 
-Name is subject to change.
+The spicy programming language.
 
 
 
-# Language Specification: TELL
+# Language Specification
 
 ## Overview
-- **Language name:** TELL (subject to change) 
 - **Paradigm:** Pretty much like rust.
 - **Goal / Purpose:** im still doing some self-discovery :D  
 - **Execution model:** transpiled into rust  
