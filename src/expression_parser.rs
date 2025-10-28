@@ -108,7 +108,7 @@ pub fn collect_range(tokens: &Vec<Token>, tok_position: &mut usize) -> (Expressi
 
 
 // CONDITION
-fn parse_condition(cond_tokens: &Vec<Token>) -> (Expression, usize) {
+pub fn parse_condition(cond_tokens: &Vec<Token>) -> (Expression, usize) {
     let mut pos = 0;
 
     let mut expr = (

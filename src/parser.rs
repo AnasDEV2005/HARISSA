@@ -12,7 +12,7 @@ General idea:
 
  */
 
-use crate::expression_parser::{collect_block, collect_condition, collect_range};
+use crate::expression_parser::{collect_block, collect_condition, collect_range, parse_condition};
 use crate::lexer::Token;
 use crate::syntaxtree::{Expression, Statement};
 

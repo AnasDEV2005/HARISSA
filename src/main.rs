@@ -9,7 +9,7 @@ mod syntaxtree;
 mod util;
 
 fn main() {
-    let contents = lexer::read_file("./example.tel");
+    let contents = lexer::read_file("./example.hrs");
 
     let tokens = tokenize(contents);
     // let parsed_contents = reader::parse_contents(contents);

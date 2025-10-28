@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "tellc"
+name = "harissa_transpiler"
 version = "0.1.0"
