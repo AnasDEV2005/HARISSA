@@ -79,6 +79,10 @@ pub enum Statement {
         body: Box<Statement>, // usually a Block
     },
 
+    Return {
+        value: Box<Expression>,
+    },
+
     ParsingError {
         message: String,
         line: i32,

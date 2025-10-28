@@ -4,7 +4,7 @@ while identifier || true {
 }
 
 
-const identifier == "string";
+const bool identifier = (str == "string");
 
 
 loop i -> (ident, ident) {

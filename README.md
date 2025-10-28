@@ -81,6 +81,23 @@ fn get_data(header string): int {
 - File and system tools  
 
 
+### Syntax highlighting
+
+For neovim
+```bash
+mkdir ~/.config/nvim/ftdetect/
+touch ~/.config/nvim/ftdetect/harissa.vim
+echo "au BufRead,BufNewFile *.hrs set filetype=harissa" >> ~/.config/nvim/ftdetect/harissa.vim
+
+
+mkdir ~/.config/nvim/syntax/
+
+# from inside the repo directory:
+
+cp ./harissa.vim ~/.config/nvim/syntax/
+
+```
+
 ---
 
 
@@ -133,3 +150,7 @@ when im moving to the next character to check for syntax errors i already know w
 - 26 october | past few days i worked on the parser. spent a whole day working on it following chatgpt's template of using a struct with methods... i wasnt familiar enough with the borrow checker so i actually got stuck.  
 I then decided to rewrite the whole parser, but without a parser struct this time. just functions and passing around indexes and vectors.  
 I then realized i had only set the loop to accept a (int, int) range. Which should be able to read an expression inside the (). So yeah i redid that, only solution here was recursion.  
+
+- 27 october | i just decided for no reason to just do syntax highlighting even tho its very far from completion. Anyways i tried tree sitter, failed mmiserably, started exercising domestic violence on my machine, tried using a /syntax/harissa.vim file. and it worked. (well not perfectly but its good enough)
+
+
